@@ -1,6 +1,10 @@
 # Deployment Guide — Streamlit Community Cloud
 
 **Live app:** https://soc-ai-copilot.streamlit.app/
+**Deployed on:** Streamlit Community Cloud
+**App entrypoint:** `app.py`
+**Default mode:** deterministic mock LLM fallback — no `OPENAI_API_KEY` required for the public demo
+**API key policy:** optional `OPENAI_API_KEY` must be configured only through Streamlit Cloud Secrets, never committed to the repository
 
 ## Quick deploy
 

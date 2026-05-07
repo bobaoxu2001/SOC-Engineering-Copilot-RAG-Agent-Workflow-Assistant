@@ -8,7 +8,7 @@
 
 > Portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
 
-**Quick demo:** run `streamlit run app.py` locally — or see the screenshots below.
+**Quick demo:** open the [live Streamlit app](https://soc-ai-copilot.streamlit.app/), run `streamlit run app.py` locally, or review the screenshots below.
 
 ## At a glance
 

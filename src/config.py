@@ -47,6 +47,8 @@ HIGH_RISK_TOPICS: tuple[str, ...] = (
     "metastability",
     "integration sign-off",
     "ip integration",
+    "ip block",
+    "soc integration",
     "assertion failure",
     # Sign-off, approval, and proprietary-data requests — always escalate
     "sign off",
