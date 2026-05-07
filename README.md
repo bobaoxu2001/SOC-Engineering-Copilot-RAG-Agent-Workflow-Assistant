@@ -4,6 +4,8 @@
 
 > Portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
 
+**Quick demo:** run `streamlit run app.py` locally — or see the screenshots below.
+
 ## At a glance
 
 | | |
@@ -172,16 +174,25 @@ The dashboard reports the embedder and saves a timestamped `eval_results.json` s
 
 ## Screenshots
 
-Four tabs, each surfacing a distinct AI capability. See [docs/screenshots/README.md](docs/screenshots/README.md) for capture instructions.
+### Tab 1 — Ask Copilot
+Cited RAG answer with confidence badge and human-review callout on a CDC/integration question.
 
-| Tab | What it shows |
-|---|---|
-| **Ask Copilot** (`01_ask_copilot.png`) | Cited RAG answer, confidence badge, and human-review callout on a CDC/reset question |
-| **Retrieval Inspector** (`02_retrieval_inspector.png`) | Top-k chunks with similarity scores, source, section, and relevance flag |
-| **Workflow Triage Agent** (`03_triage_agent.png`) | Six-step pipeline trace, metric cards, structured JSON output, generated ticket |
-| **Evaluation Dashboard** (`04_evaluation_dashboard.png`) | QA and workflow metric cards, topic distribution bar chart, per-item result table |
+![Ask Copilot tab](docs/screenshots/01_ask_copilot.png)
 
-Run `streamlit run app.py` and follow the instructions in `docs/screenshots/README.md` to generate the images locally.
+### Tab 2 — Retrieval Inspector
+Top-k chunks with similarity scores, source file, section, and a "likely relevant" flag — so reviewers can audit exactly what fed the answer.
+
+![Retrieval Inspector tab](docs/screenshots/02_retrieval_inspector.png)
+
+### Tab 3 — Workflow Triage Agent
+Paste a build/verification/lint log; the six-step pipeline returns category, severity, owner team, confidence, and a structured ticket summary.
+
+![Workflow Triage tab](docs/screenshots/03_triage_agent.png)
+
+### Tab 4 — Evaluation Dashboard
+QA and workflow metric cards including retrieval hit rate, MRR, Grounded Answer Rate, out-of-scope accuracy, and per-question result table.
+
+![Evaluation Dashboard tab](docs/screenshots/04_evaluation_dashboard.png)
 
 ## Limitations
 
@@ -203,9 +214,13 @@ Run `streamlit run app.py` and follow the instructions in `docs/screenshots/READ
 
 ```
 soc-design-knowledge-copilot/
-  app.py
+  app.py                         # Streamlit four-tab UI
+  api.py                         # FastAPI service layer (5 endpoints)
   requirements.txt
   .env.example
+  .github/
+    workflows/
+      ci.yml                     # GitHub Actions CI (pytest, no API key)
   src/
     config.py
     ingestion.py
@@ -216,18 +231,22 @@ soc-design-knowledge-copilot/
     mock_llm.py
     utils.py
   data/
-    knowledge_base/   # 6 synthetic engineering markdown docs
-    eval/             # QA (20) + workflow (8) eval sets
-    sample_logs/      # 4 synthetic build/verify/lint logs
-    index/            # FAISS index cache (gitignored except .gitkeep)
+    knowledge_base/              # 6 synthetic engineering markdown docs
+    eval/                        # QA (26) + workflow (8) eval sets
+    sample_logs/                 # 4 synthetic build/verify/lint logs
+    index/                       # FAISS index cache (gitignored except .gitkeep)
   tests/
     test_retrieval.py
     test_workflow_agent.py
     test_utils.py
+    test_api.py                  # FastAPI TestClient tests (9 tests)
   docs/
     project_brief.md
     architecture.md
     nvidia_jd_alignment.md
+    demo_script.md               # 60-90 sec recruiter walkthrough
+    resume_bullets.md            # Short/detailed/LinkedIn bullets targeting JR2017063
+    screenshots/                 # 4 app screenshots + capture instructions
 ```
 
 ## Disclaimer
