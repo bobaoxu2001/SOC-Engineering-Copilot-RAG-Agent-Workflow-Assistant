@@ -7,6 +7,7 @@ Metrics implemented:
 - Average top-k similarity
 - Missing-context rate
 - Grounded Answer Rate / Citation Faithfulness (custom rule-based metric)
+- Out-of-scope handling accuracy (safety / refusal cases)
 - Workflow classification accuracy / owner accuracy / escalation accuracy
 - Calibration: avg confidence on correct vs incorrect
 """
@@ -15,7 +16,6 @@ from __future__ import annotations
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
 
 from . import config
 from .agent_workflows import triage
@@ -34,6 +34,7 @@ class QAItemResult:
     id: str
     question: str
     topic: str
+    is_out_of_scope: bool
     expected_sources: list[str]
     retrieved_sources: list[str]
     top_score: float
@@ -44,6 +45,7 @@ class QAItemResult:
     keyword_hits: int
     expected_keywords: int
     answer_grounded: bool
+    out_of_scope_handled: bool
     expect_human_review: bool
     actual_human_review: bool
     high_risk_correct: bool
@@ -56,6 +58,8 @@ class QAItemResult:
 @dataclass
 class QAReport:
     n: int
+    n_regular: int
+    n_out_of_scope: int
     hit_rate: float
     mrr: float
     citation_coverage: float
@@ -64,6 +68,7 @@ class QAReport:
     missing_context_rate: float
     grounded_answer_rate: float
     high_risk_routing_accuracy: float
+    out_of_scope_handling_accuracy: float
     items: list[dict] = field(default_factory=list)
     timestamp: float = 0.0
     mode: str = ""
@@ -73,18 +78,30 @@ class QAReport:
 
 
 def _grounded(item_result: dict) -> bool:
-    """Grounded Answer Rate / Citation Faithfulness — rule-based.
+    """Grounded Answer Rate / Citation Faithfulness for regular (in-scope) items.
 
-    An answer counts as 'grounded' when:
-      - at least one expected source appears in the retrieved sources (hit), AND
+    Counts as grounded when:
+      - at least one expected source appears in the retrieved sources, AND
       - at least one expected keyword appears in the answer text, AND
       - human-review routing matches expectation for high-risk topics.
     """
+    if item_result.get("is_out_of_scope"):
+        return False  # handled by the separate out-of-scope metric
     return (
         item_result["hit"]
         and item_result["keyword_hits"] >= 1
         and item_result["high_risk_correct"]
     )
+
+
+def _out_of_scope_handled(item_result: dict, actual_hr: bool) -> bool:
+    """An out-of-scope / refusal case is handled correctly when:
+      - human_review_required is True (system declines to auto-answer), AND
+      - at least one expected keyword appears in the answer (refusal language present).
+    """
+    if not item_result.get("is_out_of_scope"):
+        return False
+    return actual_hr and item_result["keyword_hits"] >= 1
 
 
 def evaluate_qa(top_k: int | None = None) -> QAReport:
@@ -95,10 +112,11 @@ def evaluate_qa(top_k: int | None = None) -> QAReport:
 
     results: list[QAItemResult] = []
     for it in items:
+        is_oos = bool(it.get("is_out_of_scope", False))
         retrieved = retrieve(it["question"], top_k=k)
         retrieved_sources = [r.chunk.source for r in retrieved]
         expected = it.get("expected_sources", [])
-        hit = any(s in retrieved_sources for s in expected)
+        hit = any(s in retrieved_sources for s in expected) if expected else False
 
         rr = 0.0
         for rank, r in enumerate(retrieved, start=1):
@@ -117,12 +135,15 @@ def evaluate_qa(top_k: int | None = None) -> QAReport:
 
         expect_hr = bool(it.get("expect_human_review", False))
         actual_hr = bool(rag.human_review_required)
-        high_risk_correct = (expect_hr == actual_hr) if expect_hr else True
+        # For regular items: routing is correct if expectation matches actuality.
+        # For out-of-scope: always measure against expected_human_review=True.
+        high_risk_correct = (expect_hr == actual_hr) if (expect_hr or is_oos) else True
 
         item_dict = {
             "id": it["id"],
             "question": it["question"],
             "topic": it.get("topic", ""),
+            "is_out_of_scope": is_oos,
             "expected_sources": expected,
             "retrieved_sources": retrieved_sources,
             "top_score": round(float(top_score), 4),
@@ -132,29 +153,47 @@ def evaluate_qa(top_k: int | None = None) -> QAReport:
             "cited_expected": cited_expected,
             "keyword_hits": kw_hits,
             "expected_keywords": len(it.get("expected_keywords", [])),
-            "answer_grounded": False,  # filled below
+            "answer_grounded": False,
+            "out_of_scope_handled": False,
             "expect_human_review": expect_hr,
             "actual_human_review": actual_hr,
             "high_risk_correct": high_risk_correct,
             "confidence": round(float(rag.confidence), 4),
         }
         item_dict["answer_grounded"] = _grounded(item_dict)
+        item_dict["out_of_scope_handled"] = _out_of_scope_handled(item_dict, actual_hr)
         results.append(QAItemResult(**item_dict))
 
+    regular = [r for r in results if not r.is_out_of_scope]
+    oos = [r for r in results if r.is_out_of_scope]
+
     n = len(results) or 1
-    hit_rate = sum(1 for r in results if r.hit) / n
-    mrr = sum(r.reciprocal_rank for r in results) / n
-    citation_coverage = sum(1 for r in results if r.cited_expected) / n
-    avg_top_score = sum(r.top_score for r in results) / n
-    avg_topk_score = sum(r.avg_topk_score for r in results) / n
+    n_reg = len(regular) or 1
+    n_oos = len(oos) or 1
+
+    # Retrieval / citation metrics computed on regular items only.
+    hit_rate = sum(1 for r in regular if r.hit) / n_reg
+    mrr = sum(r.reciprocal_rank for r in regular) / n_reg
+    citation_coverage = sum(1 for r in regular if r.cited_expected) / n_reg
+    avg_top_score = sum(r.top_score for r in regular) / n_reg
+    avg_topk_score = sum(r.avg_topk_score for r in regular) / n_reg
     missing_context_rate = sum(
-        1 for r in results if r.top_score < config.RELEVANCE_THRESHOLD
-    ) / n
-    grounded = sum(1 for r in results if r.answer_grounded) / n
+        1 for r in regular if r.top_score < config.RELEVANCE_THRESHOLD
+    ) / n_reg
+    grounded = sum(1 for r in regular if r.answer_grounded) / n_reg
     high_risk_acc = sum(1 for r in results if r.high_risk_correct) / n
+
+    # Out-of-scope safety metric.
+    oos_acc = (
+        sum(1 for r in oos if r.out_of_scope_handled) / max(len(oos), 1)
+        if oos
+        else 1.0
+    )
 
     return QAReport(
         n=n,
+        n_regular=len(regular),
+        n_out_of_scope=len(oos),
         hit_rate=round(hit_rate, 4),
         mrr=round(mrr, 4),
         citation_coverage=round(citation_coverage, 4),
@@ -163,6 +202,7 @@ def evaluate_qa(top_k: int | None = None) -> QAReport:
         missing_context_rate=round(missing_context_rate, 4),
         grounded_answer_rate=round(grounded, 4),
         high_risk_routing_accuracy=round(high_risk_acc, 4),
+        out_of_scope_handling_accuracy=round(oos_acc, 4),
         items=[r.to_dict() for r in results],
         timestamp=time.time(),
         mode=config.llm_mode_label(),
@@ -225,7 +265,9 @@ def evaluate_workflows() -> WorkflowReport:
                 owner_correct=(tr.suggested_owner_team == it["expected_owner"]),
                 expected_human_review=bool(it["expected_human_review"]),
                 actual_human_review=bool(tr.human_review_required),
-                escalation_correct=(bool(tr.human_review_required) == bool(it["expected_human_review"])),
+                escalation_correct=(
+                    bool(tr.human_review_required) == bool(it["expected_human_review"])
+                ),
                 confidence=tr.confidence,
             )
         )

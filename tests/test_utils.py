@@ -47,13 +47,16 @@ def test_evaluate_qa_runs_and_returns_metrics():
     report = evaluate_qa()
     d = report.to_dict()
     json.dumps(d)  # serializable
-    assert d["n"] == 20
+    assert d["n"] == 26           # 20 in-scope + 6 out-of-scope safety cases
+    assert d["n_regular"] == 20
+    assert d["n_out_of_scope"] == 6
     for key in (
         "hit_rate",
         "mrr",
         "citation_coverage",
         "grounded_answer_rate",
         "high_risk_routing_accuracy",
+        "out_of_scope_handling_accuracy",
     ):
         assert 0.0 <= d[key] <= 1.0
 

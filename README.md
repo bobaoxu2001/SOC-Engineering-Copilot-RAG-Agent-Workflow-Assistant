@@ -1,8 +1,19 @@
 # SOC Engineering Copilot: RAG + Agent Workflow Assistant
 
-An internal AI productivity prototype for SOC / hardware engineering teams. It demonstrates how an AI application engineer would build, evaluate, and ship reliable LLM-backed services for non-AI engineering users — RAG over engineering knowledge, an agentic triage workflow over build/verification logs, and a quantitative evaluation dashboard.
+[![CI](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml)
 
-> Built as a portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
+> Portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
+
+## At a glance
+
+| | |
+|---|---|
+| **What it does** | Cited Q&A over a synthetic engineering knowledge base, transparent vector retrieval, multi-step agentic triage of build/verification/lint logs, FastAPI service layer, and a quantitative evaluation dashboard |
+| **Why it matters** | Shows the full engineering pattern for a reliable internal LLM tool: RAG design, agent orchestration, evaluation rigor, safety guardrails — targeted at hardware/SOC engineering teams |
+| **Key capabilities** | RAG · Retrieval Inspector · 6-step Triage Agent · FastAPI `/ask /retrieve /triage /evaluate` · CI pipeline |
+| **Evaluation results** | QA hit rate **95%**, grounded-answer rate **90%**, out-of-scope safety handling **100%**, high-risk routing **100%**, workflow classification **100%**, escalation **100%** |
+| **Tech stack** | Python · Streamlit · FastAPI · FAISS · sentence-transformers · OpenAI-compatible LLM · pytest · GitHub Actions |
+| **Safety framing** | High-risk topics (CDC, reset, integration, assertion failures) always trigger human-review gating. System never presents itself as a sign-off authority. |
 
 ---
 
@@ -35,7 +46,8 @@ The full traceability table lives in [docs/nvidia_jd_alignment.md](docs/nvidia_j
 - **Tab 1 — Ask Copilot.** RAG Q&A with cited answers, confidence pill, and human-review callouts on high-risk topics.
 - **Tab 2 — Retrieval Inspector.** Top-k chunks with similarity scores, sources, sections, and a "likely relevant" flag — built so reviewers can see exactly how RAG works.
 - **Tab 3 — Workflow Triage Agent.** Paste a build/verification/lint log; the agent runs a six-step pipeline (classify → retrieve → hypothesize → next-steps → escalate → ticket) and returns a structured JSON result.
-- **Tab 4 — Evaluation Dashboard.** Retrieval hit rate, MRR, citation coverage, **Grounded Answer Rate / Citation Faithfulness**, missing-context rate, and per-question failure analysis. For triage: classification accuracy, owner accuracy, escalation accuracy, calibration, and human-review rate.
+- **Tab 4 — Evaluation Dashboard.** Retrieval hit rate, MRR, citation coverage, Grounded Answer Rate, **out-of-scope safety accuracy**, and per-question failure analysis. For triage: classification accuracy, owner accuracy, escalation accuracy.
+- **FastAPI service layer** (`api.py`) — `/health`, `/ask`, `/retrieve`, `/triage`, `/evaluate` endpoints with Pydantic schemas, enabling integration with CI pipelines or other internal tools.
 
 ## Architecture
 
@@ -81,26 +93,31 @@ Full diagram and component contracts: [docs/architecture.md](docs/architecture.m
 ## Run locally
 
 ```bash
-# 1. clone, then enter the project
-cd soc-design-knowledge-copilot
+# 1. clone and enter the project
+git clone https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant.git
+cd SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant
 
 # 2. create a virtual env and install
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 # 3. (optional) configure the live LLM
 cp .env.example .env
-# edit .env to set OPENAI_API_KEY; otherwise the deterministic mock LLM is used
+# edit .env to set OPENAI_API_KEY; otherwise the deterministic mock LLM is used automatically
 
 # 4. run tests
 pytest -q
 
-# 5. launch the app
+# 5. launch the Streamlit UI
 streamlit run app.py
+
+# 6. (optional) run the FastAPI service layer
+uvicorn api:app --reload --port 8000
+# Endpoints: GET /health  POST /ask  POST /retrieve  POST /triage  POST /evaluate
 ```
 
-The first launch builds the FAISS index in `data/index/`. Subsequent launches reuse the cached index unless the knowledge base changes (signature is content-hashed). A "Rebuild index" button lives in the sidebar.
+The first launch builds the FAISS index in `data/index/`. Subsequent launches reuse the cached index unless the knowledge base changes (content-hashed). Use the **Rebuild index** button in the sidebar to force a rebuild.
 
 ## Environment variables
 
@@ -116,35 +133,31 @@ The first launch builds the FAISS index in `data/index/`. Subsequent launches re
 
 Two held-out evaluation sets ship with the project.
 
-**QA set** — 20 questions in [data/eval/qa_eval_set.json](data/eval/qa_eval_set.json). Each item lists expected source files, expected keywords, topic, difficulty, and whether human review should be triggered. Metrics:
+**QA set** — 26 questions (20 in-scope + 6 out-of-scope safety cases) in [data/eval/qa_eval_set.json](data/eval/qa_eval_set.json). Metrics computed on the appropriate sub-population:
 
-- **Retrieval hit rate @ k** — fraction of questions where any expected source appears in top-k.
-- **MRR** of the expected source.
-- **Citation coverage** — fraction of generated answers that cite ≥1 expected source.
-- **Grounded Answer Rate / Citation Faithfulness** — custom rule-based metric: an answer counts as grounded only if (a) at least one expected source appears in retrieval, AND (b) at least one expected keyword appears in the answer text, AND (c) human-review routing matches expectation for high-risk questions.
-- **Avg top-1 / top-k similarity, missing-context rate, high-risk routing accuracy.**
+- **Retrieval hit rate @ k** (in-scope only) — fraction where any expected source appears in top-k.
+- **MRR** of the expected source (in-scope only).
+- **Citation coverage** — fraction of answers citing ≥1 expected source.
+- **Grounded Answer Rate / Citation Faithfulness** — answer counts as grounded only if (a) expected source retrieved, AND (b) expected keyword in answer, AND (c) high-risk routing is correct.
+- **Out-of-scope handling accuracy** — safety/refusal questions: system must trigger human-review AND surface refusal language (sign-off, proprietary-data, and invented-RTL requests).
+- **High-risk routing accuracy** — covers all 26 questions including safety cases.
 
-**Workflow set** — 8 triage cases in [data/eval/workflow_eval_set.json](data/eval/workflow_eval_set.json). Each item lists expected category, expected owner team, and expected human-review status. Metrics:
-
-- **Classification accuracy** (issue category).
-- **Owner-team accuracy** (correct routing).
-- **Escalation accuracy** (correct human-review decision).
-- **Calibration** — average confidence on correct vs. incorrect predictions.
-- **Human-review rate** — sanity signal for over- or under-escalation.
+**Workflow set** — 8 triage cases in [data/eval/workflow_eval_set.json](data/eval/workflow_eval_set.json). Metrics: classification accuracy, owner-team accuracy, escalation accuracy, calibration, human-review rate.
 
 ## Sample results
 
-Numbers below are from a fresh end-to-end run on the synthetic knowledge base shipped in this repo, using the **deterministic mock LLM** path and the **hash-vector embedding fallback** (worst-case configuration — sentence-transformers embeddings typically improve retrieval further). Click **Run evaluation** in the dashboard to reproduce locally.
+Numbers from a fresh end-to-end run using the **deterministic mock LLM + hash-vector embedding fallback** (worst case — sentence-transformers embeddings improve retrieval further). Click **Run evaluation** in the dashboard to reproduce locally.
 
-**QA evaluation (20 questions)**
+**QA evaluation (20 in-scope + 6 safety/OOS questions)**
 
-| Metric | Result |
-|---|---|
-| Retrieval hit rate @ k=5 | **95%** |
-| Mean reciprocal rank (MRR) | **0.875** |
-| Citation coverage | **95%** |
-| Grounded Answer Rate / Citation Faithfulness | **90%** |
-| High-risk routing accuracy | **100%** |
+| Metric | Result | Scope |
+|---|---|---|
+| Retrieval hit rate @ k=5 | **95%** | In-scope (20 q) |
+| Mean reciprocal rank (MRR) | **0.875** | In-scope |
+| Citation coverage | **95%** | In-scope |
+| Grounded Answer Rate / Citation Faithfulness | **90%** | In-scope |
+| **Out-of-scope handling accuracy** | **100%** | Safety/refusal cases (6 q) |
+| High-risk routing accuracy | **100%** | All 26 q |
 
 **Workflow triage evaluation (8 cases)**
 
@@ -153,18 +166,22 @@ Numbers below are from a fresh end-to-end run on the synthetic knowledge base sh
 | Issue-category accuracy | **100%** |
 | Owner-team accuracy | **100%** |
 | Escalation accuracy | **100%** |
-| Human-review rate | 37.5% (3/8 — exactly the high-risk cases) |
+| Human-review rate | 37.5% (exactly the 3 high-risk cases) |
 
-The dashboard reports the embedder used and saves a timestamped `eval_results.json` so runs are reproducible across machines.
+The dashboard reports the embedder and saves a timestamped `eval_results.json` so results are reproducible.
 
 ## Screenshots
 
-Placeholders — capture from a local run and place under `docs/screenshots/`:
+Four tabs, each surfacing a distinct AI capability. See [docs/screenshots/README.md](docs/screenshots/README.md) for capture instructions.
 
-- `docs/screenshots/01_ask_copilot.png`
-- `docs/screenshots/02_retrieval_inspector.png`
-- `docs/screenshots/03_triage_agent.png`
-- `docs/screenshots/04_evaluation_dashboard.png`
+| Tab | What it shows |
+|---|---|
+| **Ask Copilot** (`01_ask_copilot.png`) | Cited RAG answer, confidence badge, and human-review callout on a CDC/reset question |
+| **Retrieval Inspector** (`02_retrieval_inspector.png`) | Top-k chunks with similarity scores, source, section, and relevance flag |
+| **Workflow Triage Agent** (`03_triage_agent.png`) | Six-step pipeline trace, metric cards, structured JSON output, generated ticket |
+| **Evaluation Dashboard** (`04_evaluation_dashboard.png`) | QA and workflow metric cards, topic distribution bar chart, per-item result table |
+
+Run `streamlit run app.py` and follow the instructions in `docs/screenshots/README.md` to generate the images locally.
 
 ## Limitations
 

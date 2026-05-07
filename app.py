@@ -437,7 +437,8 @@ with tab_eval:
     st.markdown(
         "**Capability:** Evaluation reliability. Quantitative retrieval and agent-quality metrics "
         "computed over a held-out evaluation set, including a custom **Grounded Answer Rate / "
-        "Citation Faithfulness** metric."
+        "Citation Faithfulness** metric and an **Out-of-scope handling accuracy** metric that "
+        "measures whether the system correctly refuses sign-off and proprietary-data requests."
     )
 
     run_eval = st.button("Run evaluation", type="primary")
@@ -448,24 +449,25 @@ with tab_eval:
             saved_path = save_eval_results(qa, wf)
         st.success(f"Evaluation complete. Results saved to `{saved_path.relative_to(config.REPO_ROOT)}`.")
 
-        st.markdown("### QA Retrieval & Answer Quality")
+        st.markdown(f"### QA Retrieval & Answer Quality  ·  {qa.n_regular} in-scope · {qa.n_out_of_scope} safety/OOS")
         c1, c2, c3, c4, c5 = st.columns(5)
         c1.markdown(metric_card("Hit rate @ k", f"{qa.hit_rate*100:.1f}%"), unsafe_allow_html=True)
         c2.markdown(metric_card("MRR", f"{qa.mrr:.3f}"), unsafe_allow_html=True)
         c3.markdown(metric_card("Citation coverage", f"{qa.citation_coverage*100:.1f}%"), unsafe_allow_html=True)
         c4.markdown(metric_card("Grounded Answer Rate", f"{qa.grounded_answer_rate*100:.1f}%"), unsafe_allow_html=True)
         c5.markdown(metric_card("High-risk routing", f"{qa.high_risk_routing_accuracy*100:.1f}%"), unsafe_allow_html=True)
-        c6, c7, c8 = st.columns(3)
+        c6, c7, c8, c9 = st.columns(4)
         c6.markdown(metric_card("Avg top-1 score", f"{qa.avg_top_score:.3f}"), unsafe_allow_html=True)
         c7.markdown(metric_card("Avg top-k score", f"{qa.avg_topk_score:.3f}"), unsafe_allow_html=True)
         c8.markdown(metric_card("Missing-context rate", f"{qa.missing_context_rate*100:.1f}%"), unsafe_allow_html=True)
+        c9.markdown(metric_card("Out-of-scope accuracy", f"{qa.out_of_scope_handling_accuracy*100:.1f}%"), unsafe_allow_html=True)
 
         qa_df = pd.DataFrame(qa.items)
         st.markdown("**Per-question results**")
         display_cols = [
-            "id", "topic", "hit", "answer_grounded", "reciprocal_rank",
-            "top_score", "keyword_hits", "expected_keywords",
-            "expect_human_review", "actual_human_review", "high_risk_correct",
+            "id", "topic", "is_out_of_scope", "hit", "answer_grounded",
+            "out_of_scope_handled", "reciprocal_rank", "top_score",
+            "keyword_hits", "expect_human_review", "actual_human_review", "high_risk_correct",
         ]
         st.dataframe(qa_df[display_cols], use_container_width=True, hide_index=True)
 

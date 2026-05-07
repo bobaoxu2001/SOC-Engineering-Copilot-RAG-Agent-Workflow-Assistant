@@ -37,15 +37,29 @@ RELEVANCE_THRESHOLD: float = 0.30
 CONFIDENCE_HUMAN_REVIEW: float = 0.55
 
 HIGH_RISK_TOPICS: tuple[str, ...] = (
+    # Hardware technical risk topics
     "cdc",
     "clock domain",
     "clock-domain",
     "reset synchronization",
     "reset deassertion",
+    "reset architecture",
     "metastability",
     "integration sign-off",
     "ip integration",
     "assertion failure",
+    # Sign-off, approval, and proprietary-data requests — always escalate
+    "sign off",
+    "sign-off",
+    "sign off ",
+    "approve",
+    "approval",
+    "tapeout",
+    "tape out",
+    "proprietary",
+    "confidential",
+    "invent the missing",
+    "ignore the context",
 )
 
 OWNER_TEAMS: dict[str, str] = {
