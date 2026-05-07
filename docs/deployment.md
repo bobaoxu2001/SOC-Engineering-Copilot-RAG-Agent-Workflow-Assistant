@@ -1,5 +1,7 @@
 # Deployment Guide — Streamlit Community Cloud
 
+**Live app:** https://soc-ai-copilot.streamlit.app/
+
 ## Quick deploy
 
 1. Go to **https://share.streamlit.io**

@@ -1,7 +1,9 @@
 # SOC Engineering Copilot: RAG + Agent Workflow Assistant
 
 [![CI](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml)
-**Live Demo:** Coming soon — deploy via [Streamlit Community Cloud](docs/deployment.md)
+[![Live Demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://soc-ai-copilot.streamlit.app/)
+
+**Live Demo:** https://soc-ai-copilot.streamlit.app/
 **GitHub:** https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant
 
 > Portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
