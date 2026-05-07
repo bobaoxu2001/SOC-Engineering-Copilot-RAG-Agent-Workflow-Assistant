@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Build / cache
+.pytest_cache/
+.streamlit/secrets.toml
+
+# Local index cache (rebuilt on demand)
+data/index/*
+!data/index/.gitkeep
+
+# Eval run artifacts (sample committed, fresh runs ignored)
+data/eval/eval_results_*.json
+
+# OS
+.DS_Store

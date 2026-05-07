@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "description": "Triage workflow evaluation set. Each item is a synthetic log snippet labeled with the expected category, owner team, and whether human review should be required.",
+  "items": [
+    {
+      "id": "wf-001",
+      "log_text": "Error-[SE] Syntax error\n  rtl/top.sv, 42\n  Error: cannot open include file \"axi_pkg.svh\".\n  Searched in: /proj/rtl/include\n[compile] FAILED\nmake: *** [build/compile.log] Error 1",
+      "expected_category": "build",
+      "expected_owner": "CAD/Methodology",
+      "expected_human_review": false
+    },
+    {
+      "id": "wf-002",
+      "log_text": "make: *** No rule to make target 'sim/regress.log', needed by 'all'.  Stop.\n[regress] PROJ_ROOT=/proj\n[regress] SIM_DIR=\n[regress] FAILED with exit code 2",
+      "expected_category": "build",
+      "expected_owner": "CAD/Methodology",
+      "expected_human_review": false
+    },
+    {
+      "id": "wf-003",
+      "log_text": "UVM_ERROR @ 412ns: tb.dut.fsm_inst [ASSERT_FAIL]\n  assert property (@(posedge clk) disable iff (!rst_n) $rose(start) |-> ##[1:3] busy);\n  Offending sequence: rst_n deasserted at 350ns, start sampled high at 360ns,\n  busy never asserted within 3 cycles.\n[regress] result: FAIL  category: assertion_failure  reset-related: yes",
+      "expected_category": "verification",
+      "expected_owner": "Verification",
+      "expected_human_review": true
+    },
+    {
+      "id": "wf-004",
+      "log_text": "WARNING [W-218] blocking_in_seq\n  rtl/datapath.sv, line 64\n  Blocking assignment '=' used inside an always_ff block.\n  Recommendation: use non-blocking assignment '<=' for sequential logic.\n[lint] result: PASS_WITH_WARNINGS",
+      "expected_category": "lint",
+      "expected_owner": "Methodology",
+      "expected_human_review": false
+    },
+    {
+      "id": "wf-005",
+      "log_text": "CDC tool report:\n  signal req_async crosses from clk_a (200MHz) to clk_b (133MHz)\n  no synchronizer found at destination domain\n  severity: HIGH\n  recommendation: insert two-flop synchronizer or handshake structure",
+      "expected_category": "cdc_reset",
+      "expected_owner": "Design + Human Review",
+      "expected_human_review": true
+    },
+    {
+      "id": "wf-006",
+      "log_text": "UVM_ERROR @ 800ns: scoreboard [SB] mismatch: expected resp=0x1A, observed resp=0x1B\n  test: dma_random_traffic  seed: 0xDEAD\n  category: scoreboard_mismatch",
+      "expected_category": "verification",
+      "expected_owner": "Verification",
+      "expected_human_review": false
+    },
+    {
+      "id": "wf-007",
+      "log_text": "[regress] test: integration_smoke\n  reset deassertion ordering between core_rst_n and bus_rst_n violated\n  bus_rst_n released before core_rst_n; downstream FIFO sampled garbage\n  category: reset_ordering",
+      "expected_category": "cdc_reset",
+      "expected_owner": "Design + Human Review",
+      "expected_human_review": true
+    },
+    {
+      "id": "wf-008",
+      "log_text": "WARNING [W-104] uninitialized_signal\n  rtl/datapath.sv, line 22\n  Signal 'pipe_valid' is read before any assignment in some paths.\n[lint] 0 errors, 1 warning",
+      "expected_category": "lint",
+      "expected_owner": "Methodology",
+      "expected_human_review": false
+    }
+  ]
+}

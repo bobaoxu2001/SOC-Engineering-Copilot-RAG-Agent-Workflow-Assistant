@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "description": "Question/answer evaluation set for SOC Engineering Copilot RAG. Public-safe, synthetic, general engineering questions. Each item lists expected source file(s), expected keywords, topic, difficulty, and whether the question should trigger human review.",
+  "items": [
+    {
+      "id": "qa-001",
+      "question": "Why is non-blocking assignment recommended in sequential logic?",
+      "expected_sources": ["rtl_design_basics.md", "systemverilog_notes.md"],
+      "expected_keywords": ["non-blocking", "always_ff", "race", "flip-flop"],
+      "topic": "rtl",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-002",
+      "question": "What is the difference between always_comb and always_ff?",
+      "expected_sources": ["systemverilog_notes.md", "rtl_design_basics.md"],
+      "expected_keywords": ["always_ff", "always_comb", "sequential", "combinational"],
+      "topic": "rtl",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-003",
+      "question": "What should I check before integrating a new IP block into an SOC?",
+      "expected_sources": ["soc_integration_checklist.md"],
+      "expected_keywords": ["IP", "integration", "register map", "clock", "reset"],
+      "topic": "integration",
+      "difficulty": "medium",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-004",
+      "question": "How should I triage a missing include file error during compile?",
+      "expected_sources": ["build_flow_makefile_notes.md"],
+      "expected_keywords": ["include", "+incdir", "file list", "path"],
+      "topic": "build",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-005",
+      "question": "What are common CDC risks during SOC integration?",
+      "expected_sources": ["clock_reset_cdc_notes.md", "soc_integration_checklist.md"],
+      "expected_keywords": ["CDC", "synchronizer", "metastability", "two-flop"],
+      "topic": "cdc",
+      "difficulty": "hard",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-006",
+      "question": "How should reset synchronization be reviewed?",
+      "expected_sources": ["clock_reset_cdc_notes.md", "rtl_design_basics.md"],
+      "expected_keywords": ["reset", "deassertion", "synchronized", "metastability"],
+      "topic": "reset",
+      "difficulty": "hard",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-007",
+      "question": "What categories do regression failures usually fall into?",
+      "expected_sources": ["verification_debug_playbook.md"],
+      "expected_keywords": ["timeout", "assertion", "scoreboard", "coverage"],
+      "topic": "verification",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-008",
+      "question": "What is a two-flop synchronizer used for and when is it not safe?",
+      "expected_sources": ["clock_reset_cdc_notes.md"],
+      "expected_keywords": ["two-flop", "synchronizer", "single-bit", "multi-bit"],
+      "topic": "cdc",
+      "difficulty": "hard",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-009",
+      "question": "What goes into a typical hardware build flow?",
+      "expected_sources": ["build_flow_makefile_notes.md"],
+      "expected_keywords": ["compile", "elaborate", "simulate", "lint", "synthesize"],
+      "topic": "build",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-010",
+      "question": "How should I respond to an assertion failure during regression?",
+      "expected_sources": ["verification_debug_playbook.md", "systemverilog_notes.md"],
+      "expected_keywords": ["assertion", "waiver", "root cause", "reset"],
+      "topic": "verification",
+      "difficulty": "medium",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-011",
+      "question": "What is the right reset strategy for SOC flops?",
+      "expected_sources": ["rtl_design_basics.md", "clock_reset_cdc_notes.md"],
+      "expected_keywords": ["asynchronous", "synchronous", "deassertion", "polarity"],
+      "topic": "reset",
+      "difficulty": "hard",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-012",
+      "question": "What are common pitfalls when writing SystemVerilog modules?",
+      "expected_sources": ["systemverilog_notes.md"],
+      "expected_keywords": ["width", "logic", "always_latch", "$display"],
+      "topic": "rtl",
+      "difficulty": "medium",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-013",
+      "question": "How do you debug an interface mismatch between two IP blocks?",
+      "expected_sources": ["soc_integration_checklist.md"],
+      "expected_keywords": ["protocol", "AXI", "ID width", "endianness"],
+      "topic": "integration",
+      "difficulty": "medium",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-014",
+      "question": "What is metastability and how do synchronizers help?",
+      "expected_sources": ["clock_reset_cdc_notes.md"],
+      "expected_keywords": ["metastability", "MTBF", "settle", "stages"],
+      "topic": "cdc",
+      "difficulty": "hard",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-015",
+      "question": "How do I avoid inferred latches in always_comb blocks?",
+      "expected_sources": ["rtl_design_basics.md", "systemverilog_notes.md"],
+      "expected_keywords": ["latch", "always_comb", "default", "assigned"],
+      "topic": "rtl",
+      "difficulty": "medium",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-016",
+      "question": "What environment variables are typically required for a hardware build?",
+      "expected_sources": ["build_flow_makefile_notes.md"],
+      "expected_keywords": ["PROJ_ROOT", "LM_LICENSE_FILE", "tool", "setup script"],
+      "topic": "build",
+      "difficulty": "easy",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-017",
+      "question": "What is on the SOC integration register-map review checklist?",
+      "expected_sources": ["soc_integration_checklist.md"],
+      "expected_keywords": ["address", "overlap", "RO", "RW", "alignment"],
+      "topic": "integration",
+      "difficulty": "medium",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-018",
+      "question": "What do concurrent assertions check that immediate assertions do not?",
+      "expected_sources": ["systemverilog_notes.md"],
+      "expected_keywords": ["concurrent", "property", "sequence", "over time"],
+      "topic": "rtl",
+      "difficulty": "medium",
+      "expect_human_review": false
+    },
+    {
+      "id": "qa-019",
+      "question": "When should a verification failure be escalated to a hardware engineer?",
+      "expected_sources": ["verification_debug_playbook.md"],
+      "expected_keywords": ["clock domain", "reset", "integration", "waiver"],
+      "topic": "verification",
+      "difficulty": "medium",
+      "expect_human_review": true
+    },
+    {
+      "id": "qa-020",
+      "question": "How can a Makefile dependency error like 'No rule to make target' be triaged?",
+      "expected_sources": ["build_flow_makefile_notes.md"],
+      "expected_keywords": ["target", "prerequisite", "make -n", "variable"],
+      "topic": "build",
+      "difficulty": "easy",
+      "expect_human_review": false
+    }
+  ]
+}

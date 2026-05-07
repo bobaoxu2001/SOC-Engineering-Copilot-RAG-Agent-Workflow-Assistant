@@ -1,0 +1,680 @@
+{
+  "qa": {
+    "n": 20,
+    "hit_rate": 0.95,
+    "mrr": 0.875,
+    "citation_coverage": 0.95,
+    "avg_top_score": 0.3368,
+    "avg_topk_score": 0.2734,
+    "missing_context_rate": 0.4,
+    "grounded_answer_rate": 0.9,
+    "high_risk_routing_accuracy": 1.0,
+    "items": [
+      {
+        "id": "qa-001",
+        "question": "Why is non-blocking assignment recommended in sequential logic?",
+        "topic": "rtl",
+        "expected_sources": [
+          "rtl_design_basics.md",
+          "systemverilog_notes.md"
+        ],
+        "retrieved_sources": [
+          "rtl_design_basics.md",
+          "rtl_design_basics.md",
+          "systemverilog_notes.md",
+          "rtl_design_basics.md",
+          "systemverilog_notes.md"
+        ],
+        "top_score": 0.3798,
+        "avg_topk_score": 0.3163,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3479
+      },
+      {
+        "id": "qa-002",
+        "question": "What is the difference between always_comb and always_ff?",
+        "topic": "rtl",
+        "expected_sources": [
+          "systemverilog_notes.md",
+          "rtl_design_basics.md"
+        ],
+        "retrieved_sources": [
+          "verification_debug_playbook.md",
+          "systemverilog_notes.md",
+          "verification_debug_playbook.md",
+          "soc_integration_checklist.md",
+          "rtl_design_basics.md"
+        ],
+        "top_score": 0.446,
+        "avg_topk_score": 0.4153,
+        "hit": true,
+        "reciprocal_rank": 0.5,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.4412
+      },
+      {
+        "id": "qa-003",
+        "question": "What should I check before integrating a new IP block into an SOC?",
+        "topic": "integration",
+        "expected_sources": [
+          "soc_integration_checklist.md"
+        ],
+        "retrieved_sources": [
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "systemverilog_notes.md",
+          "rtl_design_basics.md"
+        ],
+        "top_score": 0.3447,
+        "avg_topk_score": 0.2867,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 5,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3199
+      },
+      {
+        "id": "qa-004",
+        "question": "How should I triage a missing include file error during compile?",
+        "topic": "build",
+        "expected_sources": [
+          "build_flow_makefile_notes.md"
+        ],
+        "retrieved_sources": [
+          "build_flow_makefile_notes.md",
+          "verification_debug_playbook.md",
+          "build_flow_makefile_notes.md",
+          "verification_debug_playbook.md",
+          "rtl_design_basics.md"
+        ],
+        "top_score": 0.2406,
+        "avg_topk_score": 0.2139,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2392
+      },
+      {
+        "id": "qa-005",
+        "question": "What are common CDC risks during SOC integration?",
+        "topic": "cdc",
+        "expected_sources": [
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md"
+        ],
+        "retrieved_sources": [
+          "soc_integration_checklist.md",
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md",
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md"
+        ],
+        "top_score": 0.2132,
+        "avg_topk_score": 0.192,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 1,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2134
+      },
+      {
+        "id": "qa-006",
+        "question": "How should reset synchronization be reviewed?",
+        "topic": "reset",
+        "expected_sources": [
+          "clock_reset_cdc_notes.md",
+          "rtl_design_basics.md"
+        ],
+        "retrieved_sources": [
+          "clock_reset_cdc_notes.md",
+          "rtl_design_basics.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md",
+          "systemverilog_notes.md"
+        ],
+        "top_score": 0.3367,
+        "avg_topk_score": 0.245,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3239
+      },
+      {
+        "id": "qa-007",
+        "question": "What categories do regression failures usually fall into?",
+        "topic": "verification",
+        "expected_sources": [
+          "verification_debug_playbook.md"
+        ],
+        "retrieved_sources": [
+          "build_flow_makefile_notes.md",
+          "verification_debug_playbook.md",
+          "verification_debug_playbook.md",
+          "systemverilog_notes.md",
+          "verification_debug_playbook.md"
+        ],
+        "top_score": 0.2552,
+        "avg_topk_score": 0.1922,
+        "hit": true,
+        "reciprocal_rank": 0.5,
+        "cited_expected": true,
+        "keyword_hits": 1,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2319
+      },
+      {
+        "id": "qa-008",
+        "question": "What is a two-flop synchronizer used for and when is it not safe?",
+        "topic": "cdc",
+        "expected_sources": [
+          "clock_reset_cdc_notes.md"
+        ],
+        "retrieved_sources": [
+          "rtl_design_basics.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md"
+        ],
+        "top_score": 0.5233,
+        "avg_topk_score": 0.4484,
+        "hit": true,
+        "reciprocal_rank": 0.5,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.4972
+      },
+      {
+        "id": "qa-009",
+        "question": "What goes into a typical hardware build flow?",
+        "topic": "build",
+        "expected_sources": [
+          "build_flow_makefile_notes.md"
+        ],
+        "retrieved_sources": [
+          "build_flow_makefile_notes.md",
+          "build_flow_makefile_notes.md",
+          "rtl_design_basics.md",
+          "build_flow_makefile_notes.md",
+          "build_flow_makefile_notes.md"
+        ],
+        "top_score": 0.2315,
+        "avg_topk_score": 0.2054,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 0,
+        "expected_keywords": 5,
+        "answer_grounded": false,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2277
+      },
+      {
+        "id": "qa-010",
+        "question": "How should I respond to an assertion failure during regression?",
+        "topic": "verification",
+        "expected_sources": [
+          "verification_debug_playbook.md",
+          "systemverilog_notes.md"
+        ],
+        "retrieved_sources": [
+          "verification_debug_playbook.md",
+          "systemverilog_notes.md",
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "verification_debug_playbook.md"
+        ],
+        "top_score": 0.3405,
+        "avg_topk_score": 0.3002,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3323
+      },
+      {
+        "id": "qa-011",
+        "question": "What is the right reset strategy for SOC flops?",
+        "topic": "reset",
+        "expected_sources": [
+          "rtl_design_basics.md",
+          "clock_reset_cdc_notes.md"
+        ],
+        "retrieved_sources": [
+          "rtl_design_basics.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md",
+          "build_flow_makefile_notes.md",
+          "systemverilog_notes.md"
+        ],
+        "top_score": 0.5087,
+        "avg_topk_score": 0.4183,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 3,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.494
+      },
+      {
+        "id": "qa-012",
+        "question": "What are common pitfalls when writing SystemVerilog modules?",
+        "topic": "rtl",
+        "expected_sources": [
+          "systemverilog_notes.md"
+        ],
+        "retrieved_sources": [
+          "clock_reset_cdc_notes.md",
+          "rtl_design_basics.md",
+          "soc_integration_checklist.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md"
+        ],
+        "top_score": 0.1915,
+        "avg_topk_score": 0.1637,
+        "hit": false,
+        "reciprocal_rank": 0.0,
+        "cited_expected": false,
+        "keyword_hits": 1,
+        "expected_keywords": 4,
+        "answer_grounded": false,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.1829
+      },
+      {
+        "id": "qa-013",
+        "question": "How do you debug an interface mismatch between two IP blocks?",
+        "topic": "integration",
+        "expected_sources": [
+          "soc_integration_checklist.md"
+        ],
+        "retrieved_sources": [
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "verification_debug_playbook.md",
+          "soc_integration_checklist.md",
+          "systemverilog_notes.md"
+        ],
+        "top_score": 0.2708,
+        "avg_topk_score": 0.1886,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 2,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2334
+      },
+      {
+        "id": "qa-014",
+        "question": "What is metastability and how do synchronizers help?",
+        "topic": "cdc",
+        "expected_sources": [
+          "clock_reset_cdc_notes.md"
+        ],
+        "retrieved_sources": [
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md",
+          "clock_reset_cdc_notes.md",
+          "rtl_design_basics.md",
+          "verification_debug_playbook.md"
+        ],
+        "top_score": 0.2736,
+        "avg_topk_score": 0.2364,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2589
+      },
+      {
+        "id": "qa-015",
+        "question": "How do I avoid inferred latches in always_comb blocks?",
+        "topic": "rtl",
+        "expected_sources": [
+          "rtl_design_basics.md",
+          "systemverilog_notes.md"
+        ],
+        "retrieved_sources": [
+          "rtl_design_basics.md",
+          "rtl_design_basics.md",
+          "systemverilog_notes.md",
+          "rtl_design_basics.md",
+          "verification_debug_playbook.md"
+        ],
+        "top_score": 0.3647,
+        "avg_topk_score": 0.224,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3107
+      },
+      {
+        "id": "qa-016",
+        "question": "What environment variables are typically required for a hardware build?",
+        "topic": "build",
+        "expected_sources": [
+          "build_flow_makefile_notes.md"
+        ],
+        "retrieved_sources": [
+          "build_flow_makefile_notes.md",
+          "rtl_design_basics.md",
+          "build_flow_makefile_notes.md",
+          "clock_reset_cdc_notes.md",
+          "build_flow_makefile_notes.md"
+        ],
+        "top_score": 0.3368,
+        "avg_topk_score": 0.2635,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 1,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3075
+      },
+      {
+        "id": "qa-017",
+        "question": "What is on the SOC integration register-map review checklist?",
+        "topic": "integration",
+        "expected_sources": [
+          "soc_integration_checklist.md"
+        ],
+        "retrieved_sources": [
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "soc_integration_checklist.md",
+          "verification_debug_playbook.md",
+          "rtl_design_basics.md"
+        ],
+        "top_score": 0.4446,
+        "avg_topk_score": 0.3669,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 5,
+        "expected_keywords": 5,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.4352
+      },
+      {
+        "id": "qa-018",
+        "question": "What do concurrent assertions check that immediate assertions do not?",
+        "topic": "rtl",
+        "expected_sources": [
+          "systemverilog_notes.md"
+        ],
+        "retrieved_sources": [
+          "systemverilog_notes.md",
+          "systemverilog_notes.md",
+          "clock_reset_cdc_notes.md",
+          "clock_reset_cdc_notes.md",
+          "soc_integration_checklist.md"
+        ],
+        "top_score": 0.2764,
+        "avg_topk_score": 0.2248,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.2648
+      },
+      {
+        "id": "qa-019",
+        "question": "When should a verification failure be escalated to a hardware engineer?",
+        "topic": "verification",
+        "expected_sources": [
+          "verification_debug_playbook.md"
+        ],
+        "retrieved_sources": [
+          "verification_debug_playbook.md",
+          "verification_debug_playbook.md",
+          "systemverilog_notes.md",
+          "clock_reset_cdc_notes.md",
+          "rtl_design_basics.md"
+        ],
+        "top_score": 0.3405,
+        "avg_topk_score": 0.3023,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 4,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": true,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3348
+      },
+      {
+        "id": "qa-020",
+        "question": "How can a Makefile dependency error like 'No rule to make target' be triaged?",
+        "topic": "build",
+        "expected_sources": [
+          "build_flow_makefile_notes.md"
+        ],
+        "retrieved_sources": [
+          "build_flow_makefile_notes.md",
+          "build_flow_makefile_notes.md",
+          "systemverilog_notes.md",
+          "verification_debug_playbook.md",
+          "build_flow_makefile_notes.md"
+        ],
+        "top_score": 0.4176,
+        "avg_topk_score": 0.2634,
+        "hit": true,
+        "reciprocal_rank": 1.0,
+        "cited_expected": true,
+        "keyword_hits": 3,
+        "expected_keywords": 4,
+        "answer_grounded": true,
+        "expect_human_review": false,
+        "actual_human_review": true,
+        "high_risk_correct": true,
+        "confidence": 0.3438
+      }
+    ],
+    "timestamp": 1778135260.494596,
+    "mode": "Mock LLM (deterministic fallback)"
+  },
+  "workflow": {
+    "n": 8,
+    "category_accuracy": 1.0,
+    "owner_accuracy": 1.0,
+    "escalation_accuracy": 1.0,
+    "avg_confidence_correct": 0.5954,
+    "avg_confidence_incorrect": 0.0,
+    "human_review_rate": 0.375,
+    "items": [
+      {
+        "id": "wf-001",
+        "expected_category": "build",
+        "predicted_category": "build",
+        "category_correct": true,
+        "expected_owner": "CAD/Methodology",
+        "predicted_owner": "CAD/Methodology",
+        "owner_correct": true,
+        "expected_human_review": false,
+        "actual_human_review": false,
+        "escalation_correct": true,
+        "confidence": 0.681
+      },
+      {
+        "id": "wf-002",
+        "expected_category": "build",
+        "predicted_category": "build",
+        "category_correct": true,
+        "expected_owner": "CAD/Methodology",
+        "predicted_owner": "CAD/Methodology",
+        "owner_correct": true,
+        "expected_human_review": false,
+        "actual_human_review": false,
+        "escalation_correct": true,
+        "confidence": 0.6
+      },
+      {
+        "id": "wf-003",
+        "expected_category": "verification",
+        "predicted_category": "verification",
+        "category_correct": true,
+        "expected_owner": "Verification",
+        "predicted_owner": "Verification",
+        "owner_correct": true,
+        "expected_human_review": true,
+        "actual_human_review": true,
+        "escalation_correct": true,
+        "confidence": 0.619
+      },
+      {
+        "id": "wf-004",
+        "expected_category": "lint",
+        "predicted_category": "lint",
+        "category_correct": true,
+        "expected_owner": "Methodology",
+        "predicted_owner": "Methodology",
+        "owner_correct": true,
+        "expected_human_review": false,
+        "actual_human_review": false,
+        "escalation_correct": true,
+        "confidence": 0.713
+      },
+      {
+        "id": "wf-005",
+        "expected_category": "cdc_reset",
+        "predicted_category": "cdc_reset",
+        "category_correct": true,
+        "expected_owner": "Design + Human Review",
+        "predicted_owner": "Design + Human Review",
+        "owner_correct": true,
+        "expected_human_review": true,
+        "actual_human_review": true,
+        "escalation_correct": true,
+        "confidence": 0.6
+      },
+      {
+        "id": "wf-006",
+        "expected_category": "verification",
+        "predicted_category": "verification",
+        "category_correct": true,
+        "expected_owner": "Verification",
+        "predicted_owner": "Verification",
+        "owner_correct": true,
+        "expected_human_review": false,
+        "actual_human_review": false,
+        "escalation_correct": true,
+        "confidence": 0.614
+      },
+      {
+        "id": "wf-007",
+        "expected_category": "cdc_reset",
+        "predicted_category": "cdc_reset",
+        "category_correct": true,
+        "expected_owner": "Design + Human Review",
+        "predicted_owner": "Design + Human Review",
+        "owner_correct": true,
+        "expected_human_review": true,
+        "actual_human_review": true,
+        "escalation_correct": true,
+        "confidence": 0.285
+      },
+      {
+        "id": "wf-008",
+        "expected_category": "lint",
+        "predicted_category": "lint",
+        "category_correct": true,
+        "expected_owner": "Methodology",
+        "predicted_owner": "Methodology",
+        "owner_correct": true,
+        "expected_human_review": false,
+        "actual_human_review": false,
+        "escalation_correct": true,
+        "confidence": 0.651
+      }
+    ],
+    "timestamp": 1778135260.500913
+  }
+}

@@ -1,0 +1,19 @@
+[lint] running static checks on rtl/...
+[lint] using ruleset project_default_v3
+
+WARNING [W-218] blocking_in_seq
+  rtl/datapath.sv, line 64
+  Blocking assignment '=' used inside an always_ff block.
+  Recommendation: use non-blocking assignment '<=' for sequential logic.
+    63 |   always_ff @(posedge clk or negedge rst_n) begin
+    64 |     if (!rst_n) acc = '0;       <-- blocking assignment
+    65 |     else        acc = acc + in;
+    66 |   end
+
+WARNING [W-104] uninitialized_signal
+  rtl/datapath.sv, line 22
+  Signal 'pipe_valid' is read before any assignment in some paths.
+  Recommendation: assign a default value or include a reset branch.
+
+[lint] 0 errors, 2 warnings (both methodology, low severity)
+[lint] result: PASS_WITH_WARNINGS

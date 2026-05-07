@@ -1,0 +1,15 @@
+[setup] sourcing project env... OK
+[regress] resolving dependency graph
+[regress] target sim/regress.log depends on:
+  - sim/compile.stamp
+  - sim/elab.stamp
+  - sim/test_list.f
+
+make: Entering directory '/proj/build'
+make: *** No rule to make target 'sim/regress.log', needed by 'all'.  Stop.
+
+[regress] hint: check that PROJ_ROOT and SIM_DIR are set correctly
+[regress] hint: run `make -n regress` to print the planned commands
+[regress] PROJ_ROOT=/proj
+[regress] SIM_DIR=
+[regress] FAILED with exit code 2

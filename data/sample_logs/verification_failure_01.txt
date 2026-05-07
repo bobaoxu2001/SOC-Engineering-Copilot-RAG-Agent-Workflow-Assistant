@@ -1,0 +1,16 @@
+[regress] test: reset_release_smoke  seed: 0xC0FFEE
+[regress] phase: simulate
+UVM_INFO @ 0: reporter [RNTST] Running test reset_release_smoke...
+UVM_INFO @ 100ns: tb.dut [INIT] applying async reset
+UVM_INFO @ 350ns: tb.dut [INIT] reset deassertion observed on rst_n
+
+UVM_ERROR @ 412ns: tb.dut.fsm_inst [ASSERT_FAIL]
+  assert property (@(posedge clk) disable iff (!rst_n)
+                   $rose(start) |-> ##[1:3] busy);
+  Offending sequence: rst_n deasserted at 350ns, start sampled high at 360ns,
+  busy never asserted within 3 cycles.
+  File: rtl/fsm.sv  Line: 88
+
+UVM_INFO @ 412ns: scoreboard [SB] mismatch: expected busy=1 within 3 cycles, observed busy=0
+UVM_FATAL @ 415ns: reporter [TIMEOUT] giving up after first fatal
+[regress] result: FAIL  category: assertion_failure  reset-related: yes

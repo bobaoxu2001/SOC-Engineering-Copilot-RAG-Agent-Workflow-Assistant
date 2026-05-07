@@ -1,0 +1,17 @@
+[setup] sourcing project env... OK
+[setup] tool versions: sim 2024.06, syn 2024.03  OK
+[compile] starting compile of rtl/top.sv
+[compile] +incdir+/proj/rtl/include
+[compile] +incdir+/proj/rtl/common
+[compile] reading file list /proj/build/files/rtl.f
+Error-[SE] Syntax error
+  rtl/top.sv, 42
+  Error: cannot open include file "axi_pkg.svh".
+  Searched in:
+    /proj/rtl/include
+    /proj/rtl/common
+  Hint: confirm the include path or update the file list.
+
+[compile] elapsed 4.2s
+[compile] FAILED
+make: *** [build/compile.log] Error 1
