@@ -91,11 +91,11 @@ The README reports the current deterministic mock-LLM baseline:
 - Workflow owner-team accuracy: **100%**.
 - Workflow escalation accuracy: **100%**.
 
-These results are from the included synthetic eval sets and should be interpreted as portfolio validation, not production performance.
+These results are from the included synthetic eval sets and should be interpreted as portfolio validation, not production performance. Because the knowledge base is synthetic and intentionally small, near-perfect scores are expected in this controlled demo. A real deployment would need larger historical logs, richer internal documentation, confidence calibration, access control, monitoring, and source-level permissions before the metrics could be treated as operational evidence.
 
 ## Limitations
 
-- The knowledge base is synthetic and much smaller than a real internal documentation corpus.
+- The knowledge base is synthetic, intentionally small, and much simpler than a real internal documentation corpus.
 - The retrieval stack does not include a reranker or hybrid lexical+dense search.
 - The workflow categories are intentionally narrow.
 - The app does not include authentication, access control, audit logging, or document permissions.

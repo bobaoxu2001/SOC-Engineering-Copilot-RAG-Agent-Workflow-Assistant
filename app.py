@@ -278,7 +278,8 @@ with tab_ask:
                 )
                 st.markdown(
                     f'<div class="review-callout"><strong>Human review required</strong> — {reason}. '
-                    f"Treat this answer as general guidance and confirm with a hardware engineer.</div>",
+                    "Treat this answer as general guidance and confirm with the relevant hardware, "
+                    "design, integration, or verification owner before making decisions.</div>",
                     unsafe_allow_html=True,
                 )
             st.caption(
@@ -332,12 +333,13 @@ with tab_retr:
                 ]
             )
             st.dataframe(df, use_container_width=True, hide_index=True)
-            with st.expander("Full chunk text", expanded=False):
+            with st.expander("Full retrieved chunk text", expanded=False):
                 for r in rows:
-                    st.markdown(
-                        f"**`{r['source']}` › {r['section']}** · score `{r['score']:.3f}` · rank `{r['rank']}`"
+                    st.markdown(f"##### Rank {r['rank']}")
+                    st.caption(
+                        f"Score: {r['score']:.3f} | Source: {r['source']} | Section: {r['section']}"
                     )
-                    st.markdown(f"> {r['text']}")
+                    st.code(r["text"], language="markdown")
                     st.markdown("---")
 
 
@@ -387,7 +389,7 @@ with tab_triage:
             st.markdown(
                 '<div class="review-callout"><strong>Human review required.</strong> '
                 "This category is high-risk or the agent is not confident enough to auto-route. "
-                "A qualified engineer must review.</div>",
+                "Confirm with the relevant hardware, design, integration, or verification owner.</div>",
                 unsafe_allow_html=True,
             )
 
@@ -414,6 +416,15 @@ with tab_triage:
         with right:
             st.markdown("#### Generated ticket summary")
             st.code(result.generated_ticket_summary, language="text")
+            st.text_area(
+                "Editable ticket draft",
+                value=result.generated_ticket_summary,
+                height=120,
+            )
+            st.caption(
+                "Edit this draft before copying it into a ticketing system. "
+                "No external ticket is submitted from this demo."
+            )
             st.markdown("#### Structured output (JSON)")
             structured = {
                 k: v for k, v in result.to_dict().items() if k != "retrieved_chunks"
@@ -439,6 +450,11 @@ with tab_eval:
         "computed over a held-out evaluation set, including a custom **Grounded Answer Rate / "
         "Citation Faithfulness** metric and an **Out-of-scope handling accuracy** metric that "
         "measures whether the system correctly refuses sign-off and proprietary-data requests."
+    )
+    st.info(
+        "These metrics are computed on small synthetic held-out evaluation sets. "
+        "They are useful for portfolio validation and regression testing, but should not be "
+        "interpreted as production performance."
     )
 
     run_eval = st.button("Run evaluation", type="primary")

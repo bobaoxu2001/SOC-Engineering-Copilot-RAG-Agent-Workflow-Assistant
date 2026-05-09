@@ -30,6 +30,8 @@ The app has four surfaces: Ask Copilot for cited answers, Retrieval Inspector fo
 
 The project emphasizes reliability patterns expected in real internal tools: offline reproducibility, human-review gates for high-risk topics, explicit limitations, CI tests, and held-out eval sets measuring retrieval hit rate, MRR, grounded-answer rate, safety handling, and workflow routing accuracy.
 
+The knowledge base and evaluation sets are synthetic and intentionally small, so near-perfect results are expected in this controlled portfolio demo. A production deployment would require larger historical logs, richer internal documentation, calibrated confidence thresholds, access control, monitoring, and source-level permissions.
+
 ## Resume bullet versions
 
 ### AI Engineer version

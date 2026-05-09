@@ -122,7 +122,8 @@ def answer(query: str, top_k: Optional[int] = None) -> RAGResponse:
     if high_risk and "human" not in (text or "").lower():
         text = (text or "").rstrip() + (
             "\n\n**Human review required.** This topic is high-risk; treat the "
-            "above as general guidance and confirm with a qualified hardware engineer."
+            "above as general guidance and confirm with the relevant hardware, "
+            "design, integration, or verification owner before making decisions."
         )
 
     embedder = ""
