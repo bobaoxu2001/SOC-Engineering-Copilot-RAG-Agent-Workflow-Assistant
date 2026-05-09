@@ -155,6 +155,8 @@ Two held-out evaluation sets ship with the project.
 
 Numbers from a fresh end-to-end run using the **deterministic mock LLM + hash-vector embedding fallback** (worst case — sentence-transformers embeddings improve retrieval further). Click **Run evaluation** in the dashboard to reproduce locally.
 
+Results are measured on synthetic held-out evaluation sets and should be interpreted as portfolio validation, not production performance.
+
 **QA evaluation (20 in-scope + 6 safety/OOS questions)**
 
 | Metric | Result | Scope |
@@ -218,7 +220,7 @@ QA and workflow metric cards including retrieval hit rate, MRR, Grounded Answer 
 ## Repository layout
 
 ```
-soc-design-knowledge-copilot/
+SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/
   app.py                         # Streamlit four-tab UI
   api.py                         # FastAPI service layer (5 endpoints)
   requirements.txt
