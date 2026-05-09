@@ -1,0 +1,7 @@
+[formal] running property suite for fifo_ctrl
+[formal] property failed: p_no_underflow
+[formal] CEX counterexample depth: 7 cycles
+[formal] assumption reset_released_after_init may be missing for the failing trace
+[formal] unreachable state warning on idle_to_pop transition
+[formal] inspect counterexample and assumptions before changing RTL
+[formal] result: FAIL

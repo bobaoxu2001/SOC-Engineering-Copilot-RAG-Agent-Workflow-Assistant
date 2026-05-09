@@ -1,0 +1,7 @@
+[synthesis] tool: Design Compiler synthetic run
+[synthesis] reading rtl/dma_ctrl.sv
+[synthesis] elaboration complete
+[synthesis] warning: inferred latch in module dma_ctrl for signal next_state
+[synthesis] error: unmapped logic remains in u_dma/u_crc due to unsupported variable part-select
+[synthesis] check target library and coding style before rerun
+[synthesis] result: FAILED

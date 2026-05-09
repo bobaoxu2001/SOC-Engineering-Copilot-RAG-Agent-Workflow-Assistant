@@ -1,4 +1,4 @@
-"""Multi-step triage agent for build / verification / lint logs.
+"""Multi-step triage agent for engineering workflow logs.
 
 Pipeline:
     1. classify_issue        — keyword + regex rules
@@ -52,6 +52,38 @@ LINT_PATTERNS = [
     r"PASS_WITH_WARNINGS",
 ]
 
+TIMING_PATTERNS = [
+    r"\bSTA\b",
+    r"timing\s+(violation|failed|fail)",
+    r"\b(setup|hold)\s+(violation|slack)",
+    r"\bWNS\b|\bTNS\b",
+    r"negative\s+slack",
+]
+
+SYNTHESIS_PATTERNS = [
+    r"\bsynth(es(is|ize|ized))?\b",
+    r"unmapped\s+(cell|logic)",
+    r"inferred\s+latch",
+    r"elaboration\s+(error|failed)",
+    r"Design\s+Compiler|dc_shell",
+]
+
+FORMAL_PATTERNS = [
+    r"\bformal\b",
+    r"\bLEC\b|equivalence\s+check",
+    r"property\s+(failed|failing|unproven)",
+    r"unreachable\s+state",
+    r"counterexample|CEX",
+]
+
+DFT_PATTERNS = [
+    r"\bDFT\b",
+    r"\bATPG\b",
+    r"scan\s+(chain|stitch|enable|coverage)",
+    r"stuck-at",
+    r"test_mode|mbist|lbist",
+]
+
 BUILD_PATTERNS = [
     r"cannot open include file",
     r"No rule to make target",
@@ -67,12 +99,16 @@ def _matches_any(text: str, patterns: list[str]) -> int:
 
 
 def classify_issue(log_text: str) -> tuple[str, dict]:
-    """Return (category, scores). Categories: build | verification | lint | cdc_reset | unknown."""
+    """Return (category, scores) for supported workflow triage categories."""
     scores = {
         "build": _matches_any(log_text, BUILD_PATTERNS),
         "verification": _matches_any(log_text, VERIFICATION_PATTERNS),
         "lint": _matches_any(log_text, LINT_PATTERNS),
         "cdc_reset": _matches_any(log_text, CDC_RESET_PATTERNS),
+        "timing": _matches_any(log_text, TIMING_PATTERNS),
+        "synthesis": _matches_any(log_text, SYNTHESIS_PATTERNS),
+        "formal": _matches_any(log_text, FORMAL_PATTERNS),
+        "dft": _matches_any(log_text, DFT_PATTERNS),
     }
     if scores["cdc_reset"] >= 1 and scores["verification"] >= 1:
         return "cdc_reset", scores
@@ -91,6 +127,10 @@ CATEGORY_TO_SOURCES: dict[str, list[str]] = {
     "verification": ["verification_debug_playbook.md", "systemverilog_notes.md"],
     "lint": ["systemverilog_notes.md", "rtl_design_basics.md"],
     "cdc_reset": ["clock_reset_cdc_notes.md", "verification_debug_playbook.md", "soc_integration_checklist.md"],
+    "timing": ["soc_integration_checklist.md", "clock_reset_cdc_notes.md"],
+    "synthesis": ["rtl_design_basics.md", "build_flow_makefile_notes.md"],
+    "formal": ["verification_debug_playbook.md", "systemverilog_notes.md"],
+    "dft": ["soc_integration_checklist.md", "rtl_design_basics.md"],
     "unknown": [],
 }
 
@@ -125,6 +165,26 @@ ROOT_CAUSE_TEMPLATES: dict[str, list[tuple[str, str]]] = {
         (r"two[- ]?flop", "Multi-bit signal crossing without an approved CDC structure. High-risk; requires hardware-engineer review."),
         (r"metastab", "Metastability risk on a CDC path. High-risk; requires hardware-engineer review."),
     ],
+    "timing": [
+        (r"setup\s+(violation|slack)", "Setup timing violation. Review the path, constraints, and recent RTL or floorplan changes before attempting fixes."),
+        (r"hold\s+(violation|slack)", "Hold timing violation. Check short data paths, clock skew assumptions, and constraint quality."),
+        (r"negative\s+slack|\bWNS\b", "Negative slack reported by STA. Prioritize the worst path and confirm the active corner and constraint mode."),
+    ],
+    "synthesis": [
+        (r"unmapped\s+(cell|logic)", "Synthesis left logic unmapped. Check target libraries, unsupported constructs, and synthesis constraints."),
+        (r"inferred\s+latch", "Synthesis inferred a latch. Review combinational assignments and default branches."),
+        (r"elaboration\s+(error|failed)", "Synthesis elaboration failed. Check parameters, generated RTL, and module binding."),
+    ],
+    "formal": [
+        (r"equivalence|LEC", "Formal equivalence failed. Compare the failing cone and confirm constraints before changing RTL."),
+        (r"property\s+(failed|failing|unproven)|counterexample|CEX", "A formal property is failing or unproven. Inspect the counterexample and assumptions."),
+        (r"unreachable\s+state", "Formal analysis found unreachable state. Review constraints and state-encoding assumptions."),
+    ],
+    "dft": [
+        (r"scan\s+(chain|stitch)", "Scan chain stitching issue. Check scan connectivity, wrappers, and test-mode constraints."),
+        (r"ATPG|stuck-at", "ATPG coverage or stuck-at issue. Review untestable logic, constraints, and controllability/observability."),
+        (r"test_mode|mbist|lbist", "DFT mode or BIST issue. Confirm mode controls, clocking, and reset behavior in test configuration."),
+    ],
 }
 
 GENERIC_ROOT_CAUSE = {
@@ -132,6 +192,10 @@ GENERIC_ROOT_CAUSE = {
     "verification": "Verification failure. Categorize against the regression-failure taxonomy and reproduce locally before changing RTL.",
     "lint": "Static-checker finding. Treat as methodology cleanup unless escalated.",
     "cdc_reset": "Clock-domain or reset finding. High-risk; escalate for hardware-engineer review.",
+    "timing": "Timing signoff-stage finding. Review STA context, constraints, and recent physical or RTL changes.",
+    "synthesis": "Synthesis-stage failure. Check elaboration, constraints, libraries, and coding style before rerunning.",
+    "formal": "Formal verification finding. Inspect the counterexample, assumptions, and design intent before changing RTL.",
+    "dft": "DFT-stage finding. Review scan, ATPG, or test-mode setup with the DFT owner.",
     "unknown": "Could not determine the issue category from the log. Manual triage required.",
 }
 
@@ -171,6 +235,30 @@ DEFAULT_NEXT_STEPS: dict[str, list[str]] = {
         "Confirm whether the path is a known waiver or a new finding.",
         "Open a ticket and tag the design owner for the involved clock domains.",
     ],
+    "timing": [
+        "Confirm the failing corner, mode, path group, and worst negative slack.",
+        "Check whether constraints, generated clocks, or false/multicycle paths changed recently.",
+        "Review the top violating path before proposing RTL or physical fixes.",
+        "Route timing sign-off decisions to the STA or physical-design owner.",
+    ],
+    "synthesis": [
+        "Re-run synthesis elaboration on the smallest failing block if possible.",
+        "Check target libraries, parameter overrides, and generated RTL inputs.",
+        "Review inferred latch or unmapped-logic warnings before changing RTL.",
+        "Confirm constraints and tool setup with the synthesis owner.",
+    ],
+    "formal": [
+        "Open the counterexample trace and identify the first divergence or failed assumption.",
+        "Confirm whether constraints are over-restrictive or missing.",
+        "Compare the failing property against the design intent.",
+        "Route proof or equivalence sign-off decisions to the formal owner.",
+    ],
+    "dft": [
+        "Confirm the failing scan chain, ATPG pattern, or test mode.",
+        "Check test-mode constraints, scan enable connectivity, and reset behavior.",
+        "Review coverage loss against known exclusions or waivers.",
+        "Route test architecture decisions to the DFT owner.",
+    ],
     "unknown": [
         "Re-run the failing job to rule out infrastructure flakiness.",
         "Capture the full log and route to the methodology team for routing.",
@@ -205,6 +293,10 @@ SEVERITY_BY_CATEGORY = {
     "verification": "high",
     "lint": "low",
     "cdc_reset": "high",
+    "timing": "high",
+    "synthesis": "medium",
+    "formal": "high",
+    "dft": "medium",
     "unknown": "medium",
 }
 
@@ -223,6 +315,8 @@ def decide_escalation(
 
     Escalation policy:
       - Always escalate `cdc_reset` and `unknown`.
+      - Always escalate timing and formal findings because they are commonly
+        signoff-adjacent and need the appropriate owner to confirm.
       - Always escalate `verification` cases that contain assertion failures
         (high-risk per the verification playbook).
       - Otherwise escalate only when the classifier itself is uncertain (top
@@ -243,7 +337,7 @@ def decide_escalation(
         confidence = max(confidence, 0.60)
     confidence = float(max(0.0, min(1.0, confidence)))
 
-    if category in ("cdc_reset", "unknown"):
+    if category in ("cdc_reset", "timing", "formal", "unknown"):
         return owner, True, confidence
     if category == "verification" and _is_assertion_failure(log_text):
         return owner, True, confidence

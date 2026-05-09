@@ -14,9 +14,9 @@
 
 | | |
 |---|---|
-| **What it does** | Cited Q&A over a synthetic engineering knowledge base, transparent vector retrieval, multi-step agentic triage of build/verification/lint logs, FastAPI service layer, and a quantitative evaluation dashboard |
+| **What it does** | Cited Q&A over a synthetic engineering knowledge base, transparent dense/hybrid retrieval, multi-step agentic triage of engineering workflow logs, FastAPI service layer, and a quantitative evaluation dashboard |
 | **Why it matters** | Shows the full engineering pattern for a reliable internal LLM tool: RAG design, agent orchestration, evaluation rigor, safety guardrails, API boundaries, and offline-safe demos |
-| **Key capabilities** | RAG · Retrieval Inspector · 6-step Triage Agent · FastAPI `/ask /retrieve /triage /evaluate` · CI pipeline |
+| **Key capabilities** | RAG · Dense vs hybrid retrieval comparison · Retrieval Inspector · 6-step Triage Agent · FastAPI `/ask /retrieve /triage /evaluate` · CI pipeline |
 | **Evaluation results** | QA hit rate **95%**, grounded-answer rate **90%**, out-of-scope safety handling **100%**, high-risk routing **100%**, workflow classification **100%**, escalation **100%** |
 | **Tech stack** | Python · Streamlit · FastAPI · FAISS · sentence-transformers · OpenAI-compatible LLM · pytest · GitHub Actions |
 | **Safety framing** | High-risk topics (CDC, reset, integration, assertion failures) always trigger human-review gating. System never presents itself as a sign-off authority. |
@@ -39,8 +39,8 @@ This project is intentionally framed for multiple applied AI roles: AI Engineer,
 
 | Role signal | Where this project demonstrates it |
 |---|---|
-| RAG / knowledge systems | Header-aware chunking, FAISS vector search, source+section citations, and retrieval inspection (`src/ingestion.py`, `src/retrieval.py`) |
-| AI agent workflows | 6-step deterministic triage pipeline with explicit classification, retrieval, hypothesis, next steps, escalation, and ticket summary (`src/agent_workflows.py`) |
+| RAG / knowledge systems | Header-aware chunking, FAISS vector search, lightweight hybrid retrieval, source+section citations, and retrieval inspection (`src/ingestion.py`, `src/retrieval.py`) |
+| AI agent workflows | 6-step deterministic triage pipeline with explicit classification, retrieval, hypothesis, next steps, escalation, and ticket summary across build, verification, lint, CDC/reset, timing, synthesis, formal, and DFT logs (`src/agent_workflows.py`) |
 | AI service deployment | FastAPI layer over the same RAG and agent modules (`api.py`) |
 | Evaluation rigor | Held-out QA and workflow eval sets with hit rate, MRR, grounded-answer rate, safety handling, and routing accuracy (`src/evaluation.py`) |
 | Product judgment | Human-review gating, transparent retrieval, offline demo mode, and clear limits around sign-off authority |
@@ -53,7 +53,7 @@ The NVIDIA-specific traceability table remains in [docs/nvidia_jd_alignment.md](
 - **Tab 1 — Ask Copilot.** RAG Q&A with cited answers, confidence pill, and human-review callouts on high-risk topics.
 - **Tab 2 — Retrieval Inspector.** Top-k chunks with similarity scores, sources, sections, and a "likely relevant" flag — built so reviewers can see exactly how RAG works.
 - **Tab 3 — Workflow Triage Agent.** Paste a build/verification/lint log; the agent runs a six-step pipeline (classify → retrieve → hypothesize → next-steps → escalate → ticket) and returns a structured JSON result.
-- **Tab 4 — Evaluation Dashboard.** Retrieval hit rate, MRR, citation coverage, Grounded Answer Rate, **out-of-scope safety accuracy**, and per-question failure analysis. For triage: classification accuracy, owner accuracy, escalation accuracy.
+- **Tab 4 — Evaluation Dashboard.** Retrieval hit rate, MRR, citation coverage, Grounded Answer Rate, dense vs hybrid retrieval comparison, **out-of-scope safety accuracy**, and per-question error analysis. For triage: classification accuracy, owner accuracy, escalation accuracy, and a workflow confusion matrix.
 - **FastAPI service layer** (`api.py`) — `/health`, `/ask`, `/retrieve`, `/triage`, `/evaluate` endpoints with Pydantic schemas, enabling integration with CI pipelines or other internal tools.
 
 ## Architecture
@@ -90,7 +90,7 @@ Full diagram and component contracts: [docs/architecture.md](docs/architecture.m
 
 - **Python 3.10+**
 - **Streamlit** for the UI
-- **FAISS** for the local vector index
+- **FAISS** for the local vector index, plus lightweight lexical scoring for hybrid retrieval comparison
 - **sentence-transformers** for embeddings (with a deterministic hash-vector fallback if the model cannot be loaded)
 - **OpenAI-compatible Chat Completions** for the live LLM path (works with OpenAI, Together, Groq, vLLM, Ollama via `OPENAI_BASE_URL`)
 - **pandas / numpy** for evaluation and dashboard tables
@@ -149,7 +149,7 @@ Two held-out evaluation sets ship with the project.
 - **Out-of-scope handling accuracy** — safety/refusal questions: system must trigger human-review AND surface refusal language (sign-off, proprietary-data, and invented-RTL requests).
 - **High-risk routing accuracy** — covers all 26 questions including safety cases.
 
-**Workflow set** — 8 triage cases in [data/eval/workflow_eval_set.json](data/eval/workflow_eval_set.json). Metrics: classification accuracy, owner-team accuracy, escalation accuracy, calibration, human-review rate.
+**Workflow set** — 12 triage cases in [data/eval/workflow_eval_set.json](data/eval/workflow_eval_set.json). Metrics: classification accuracy, owner-team accuracy, escalation accuracy, calibration, human-review rate, and issue-category confusion matrix.
 
 ## Sample results
 
@@ -168,14 +168,21 @@ Results are measured on synthetic held-out evaluation sets and should be interpr
 | **Out-of-scope handling accuracy** | **100%** | Safety/refusal cases (6 q) |
 | High-risk routing accuracy | **100%** | All 26 q |
 
-**Workflow triage evaluation (8 cases)**
+**Dense vs hybrid retrieval comparison (20 in-scope QA cases)**
+
+| Method | Hit rate @ k=5 | MRR | Citation coverage |
+|---|---:|---:|---:|
+| Dense | **95%** | **0.875** | **95%** |
+| Hybrid | **95%** | **0.950** | **95%** |
+
+**Workflow triage evaluation (12 cases)**
 
 | Metric | Result |
 |---|---|
 | Issue-category accuracy | **100%** |
 | Owner-team accuracy | **100%** |
 | Escalation accuracy | **100%** |
-| Human-review rate | 37.5% (exactly the 3 high-risk cases) |
+| Human-review rate | 41.7% (exactly the 5 high-risk/signoff-adjacent cases) |
 
 The dashboard reports the embedder and saves a timestamped `eval_results.json` so results are reproducible.
 
@@ -205,14 +212,14 @@ QA and workflow metric cards including retrieval hit rate, MRR, Grounded Answer 
 
 - **Synthetic public-safe knowledge base.** Real internal documents would be denser and more diverse; a real deployment would also need access controls and PII review.
 - **Single-language and English-only** in this prototype.
-- **No reranker.** A cross-encoder reranker would likely raise hit rate and grounded-answer rate; left out for simplicity.
+- **No reranker.** A lightweight hybrid baseline is included, but no cross-encoder reranker is used.
 - **No long-term memory or per-user preferences.**
 - **No GPU dependency.** All embedding and inference paths are CPU-friendly, which keeps the demo portable but caps throughput.
 
 ## Future improvements
 
-- Add a cross-encoder reranker on top of FAISS.
-- Hybrid retrieval (BM25 + dense) for query types where lexical match dominates.
+- Add a cross-encoder reranker on top of dense/hybrid retrieval.
+- Improve hybrid retrieval weighting and compare against a stronger BM25 baseline.
 - Per-domain confidence calibration based on historic eval runs.
 - Plug in an internal documentation source via a connector pattern.
 - Track per-tool latency and per-step token usage in the dashboard.

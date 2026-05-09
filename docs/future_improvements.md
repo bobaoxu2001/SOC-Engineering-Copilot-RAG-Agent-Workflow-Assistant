@@ -9,7 +9,8 @@ This roadmap keeps the project honest as a portfolio demo while outlining practi
 
 ## Add Hybrid Retrieval And Reranking
 
-- Compare dense FAISS retrieval against BM25+dense hybrid retrieval.
+- Replace the current lightweight lexical overlap scorer with a stronger BM25 implementation if the corpus grows.
+- Tune dense/hybrid weighting by query type instead of using one fixed blend.
 - Add a cross-encoder reranker and measure whether it improves hit rate, MRR, and grounded-answer rate.
 
 ## Add Confidence Calibration
@@ -19,8 +20,8 @@ This roadmap keeps the project honest as a portfolio demo while outlining practi
 
 ## Expand Triage Categories
 
-- Add timing, synthesis, formal verification, and DFT triage categories.
-- Extend workflow eval coverage for each new category before surfacing it in the app.
+- Add deeper subcategories for timing, synthesis, formal verification, and DFT findings.
+- Extend workflow eval coverage with more cases per category before treating category-level metrics as meaningful.
 
 ## Add Deeper Error Analysis
 

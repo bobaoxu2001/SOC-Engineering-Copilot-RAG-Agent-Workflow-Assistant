@@ -59,12 +59,19 @@ def test_evaluate_qa_runs_and_returns_metrics():
         "out_of_scope_handling_accuracy",
     ):
         assert 0.0 <= d[key] <= 1.0
+    comparison = d["retrieval_comparison"]
+    assert {row["method"] for row in comparison} == {"dense", "hybrid"}
+    for row in comparison:
+        assert 0.0 <= row["hit_rate"] <= 1.0
+        assert 0.0 <= row["mrr"] <= 1.0
 
 
 def test_evaluate_workflows_runs_and_returns_metrics():
     report = evaluate_workflows()
     d = report.to_dict()
     json.dumps(d)
-    assert d["n"] == 8
+    assert d["n"] == 12
     assert 0.0 <= d["category_accuracy"] <= 1.0
     assert 0.0 <= d["escalation_accuracy"] <= 1.0
+    labels = {row["expected"] for row in d["confusion_matrix"]}
+    assert {"timing", "synthesis", "formal", "dft"} <= labels

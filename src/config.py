@@ -69,6 +69,10 @@ OWNER_TEAMS: dict[str, str] = {
     "verification": "Verification",
     "lint": "Methodology",
     "cdc_reset": "Design + Human Review",
+    "timing": "Timing/STA",
+    "synthesis": "Synthesis",
+    "formal": "Formal Verification",
+    "dft": "DFT",
     "unknown": "Human Review",
 }
 

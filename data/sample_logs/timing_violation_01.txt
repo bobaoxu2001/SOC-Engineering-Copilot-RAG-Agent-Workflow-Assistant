@@ -1,0 +1,8 @@
+[sta] running timing signoff snapshot for block dma_ctrl
+[sta] corner: ss_0p72v_125c  mode: functional
+[sta] path group: core_clk
+[sta] WNS = -0.182ns  TNS = -3.41ns
+[sta] setup violation on path u_dma/u_arb/state_reg[2] -> u_dma/u_arb/grant_reg[0]
+[sta] endpoint slack: negative slack, required time missed
+[sta] hint: confirm generated-clock constraints and recent RTL changes before proposing fixes
+[sta] result: timing FAILED

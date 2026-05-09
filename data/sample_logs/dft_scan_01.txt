@@ -1,0 +1,6 @@
+[dft] running scan insertion and ATPG smoke
+[dft] scan chain 3 has broken scan_enable connectivity near u_core/u_regfile
+[dft] ATPG stuck-at coverage dropped to 88.4 percent
+[dft] test_mode constraint missing for generated test clock
+[dft] review scan stitching and controllability before signoff discussion
+[dft] result: FAIL

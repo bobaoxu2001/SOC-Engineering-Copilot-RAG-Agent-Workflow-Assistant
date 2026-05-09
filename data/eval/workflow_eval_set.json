@@ -57,6 +57,34 @@
       "expected_category": "lint",
       "expected_owner": "Methodology",
       "expected_human_review": false
+    },
+    {
+      "id": "wf-009",
+      "log_text": "[sta] WNS = -0.182ns  TNS = -3.41ns\nsetup violation on path u_dma/u_arb/state_reg[2] -> u_dma/u_arb/grant_reg[0]\nnegative slack reported in corner ss_0p72v_125c\n[sta] result: timing FAILED",
+      "expected_category": "timing",
+      "expected_owner": "Timing/STA",
+      "expected_human_review": true
+    },
+    {
+      "id": "wf-010",
+      "log_text": "[synthesis] Design Compiler run\nwarning: inferred latch in module dma_ctrl for signal next_state\nerror: unmapped logic remains in u_dma/u_crc due to unsupported variable part-select\n[synthesis] result: FAILED",
+      "expected_category": "synthesis",
+      "expected_owner": "Synthesis",
+      "expected_human_review": false
+    },
+    {
+      "id": "wf-011",
+      "log_text": "[formal] property failed: p_no_underflow\nCEX counterexample depth: 7 cycles\nunreachable state warning on idle_to_pop transition\ninspect assumptions before changing RTL\n[formal] result: FAIL",
+      "expected_category": "formal",
+      "expected_owner": "Formal Verification",
+      "expected_human_review": true
+    },
+    {
+      "id": "wf-012",
+      "log_text": "[dft] scan chain 3 has broken scan_enable connectivity near u_core/u_regfile\nATPG stuck-at coverage dropped to 88.4 percent\ntest_mode constraint missing for generated test clock\n[dft] result: FAIL",
+      "expected_category": "dft",
+      "expected_owner": "DFT",
+      "expected_human_review": false
     }
   ]
 }

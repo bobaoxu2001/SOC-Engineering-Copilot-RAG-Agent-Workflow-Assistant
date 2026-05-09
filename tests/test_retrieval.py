@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from src.ingestion import build_or_load_index, chunk_corpus
-from src.retrieval import index_status, retrieve
+from src.retrieval import compare_retrieval_methods, index_status, retrieve, retrieve_hybrid
 
 
 def test_chunking_produces_chunks():
@@ -38,6 +38,23 @@ def test_retrieve_scores_sorted_descending():
 def test_retrieve_empty_query_returns_empty():
     assert retrieve("") == []
     assert retrieve("   ") == []
+
+
+def test_hybrid_retrieval_returns_ranked_results():
+    items = retrieve_hybrid("include path missing compile error", top_k=5)
+    assert items
+    assert len(items) <= 5
+    scores = [it.score for it in items]
+    assert scores == sorted(scores, reverse=True)
+    assert all(it.dense_score is not None for it in items)
+    assert all(it.lexical_score is not None for it in items)
+
+
+def test_compare_retrieval_methods_returns_dense_and_hybrid():
+    out = compare_retrieval_methods("CDC synchronizer metastability", top_k=3)
+    assert set(out) == {"dense", "hybrid"}
+    assert out["dense"]
+    assert out["hybrid"]
 
 
 def test_index_status_reports_sources():

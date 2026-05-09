@@ -481,6 +481,18 @@ with tab_eval:
         c9.markdown(metric_card("Out-of-scope accuracy", f"{qa.out_of_scope_handling_accuracy*100:.1f}%"), unsafe_allow_html=True)
 
         qa_df = pd.DataFrame(qa.items)
+        st.markdown("**Dense vs Hybrid Retrieval Comparison**")
+        st.caption(
+            "Comparison is computed on the same small synthetic held-out QA set. "
+            "Hybrid combines dense FAISS similarity with lightweight lexical matching."
+        )
+        comparison_df = pd.DataFrame(qa.retrieval_comparison)
+        if not comparison_df.empty:
+            display_comparison = comparison_df.copy()
+            for col in ("hit_rate", "citation_coverage"):
+                display_comparison[col] = (display_comparison[col] * 100).round(1).astype(str) + "%"
+            st.dataframe(display_comparison, width="stretch", hide_index=True)
+
         st.markdown("**Per-question results**")
         display_cols = [
             "id", "topic", "is_out_of_scope", "hit", "answer_grounded",
@@ -493,14 +505,42 @@ with tab_eval:
         topic_counts = qa_df.groupby("topic").size().reset_index(name="count")
         st.bar_chart(topic_counts.set_index("topic"))
 
-        failures = qa_df[~qa_df["hit"]]
-        if not failures.empty:
-            st.markdown("**Retrieval misses**")
-            st.dataframe(
-                failures[["id", "question", "expected_sources", "retrieved_sources"]],
-                width="stretch",
-                hide_index=True,
-            )
+        st.markdown("**Error analysis**")
+        miss_col1, miss_col2, miss_col3 = st.columns(3)
+        retrieval_misses = qa_df[~qa_df["hit"]]
+        citation_misses = qa_df[~qa_df["cited_expected"]]
+        safety_misses = qa_df[~qa_df["high_risk_correct"]]
+        miss_col1.markdown(metric_card("Retrieval misses", str(len(retrieval_misses))), unsafe_allow_html=True)
+        miss_col2.markdown(metric_card("Citation misses", str(len(citation_misses))), unsafe_allow_html=True)
+        miss_col3.markdown(metric_card("Safety routing misses", str(len(safety_misses))), unsafe_allow_html=True)
+
+        with st.expander("Retrieval misses", expanded=False):
+            if retrieval_misses.empty:
+                st.success("No retrieval misses in this run.")
+            else:
+                st.dataframe(
+                    retrieval_misses[["id", "question", "expected_sources", "retrieved_sources"]],
+                    width="stretch",
+                    hide_index=True,
+                )
+        with st.expander("Citation misses", expanded=False):
+            if citation_misses.empty:
+                st.success("No citation misses in this run.")
+            else:
+                st.dataframe(
+                    citation_misses[["id", "question", "expected_sources", "retrieved_sources"]],
+                    width="stretch",
+                    hide_index=True,
+                )
+        with st.expander("Safety routing misses", expanded=False):
+            if safety_misses.empty:
+                st.success("No safety routing misses in this run.")
+            else:
+                st.dataframe(
+                    safety_misses[["id", "question", "expect_human_review", "actual_human_review"]],
+                    width="stretch",
+                    hide_index=True,
+                )
 
         st.markdown("---")
         st.markdown("### Workflow Triage Quality")
@@ -517,6 +557,11 @@ with tab_eval:
         wf_df = pd.DataFrame(wf.items)
         st.markdown("**Per-case results**")
         st.dataframe(wf_df, width="stretch", hide_index=True)
+
+        st.markdown("**Workflow category confusion matrix**")
+        confusion_df = pd.DataFrame(wf.confusion_matrix)
+        if not confusion_df.empty:
+            st.dataframe(confusion_df, width="stretch", hide_index=True)
 
         wf_fail = wf_df[~wf_df["category_correct"]]
         if not wf_fail.empty:

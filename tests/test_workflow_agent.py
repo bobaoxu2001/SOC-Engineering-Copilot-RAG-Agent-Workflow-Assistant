@@ -39,6 +39,20 @@ def test_assertion_failure_triggers_human_review():
     assert result.human_review_required is True
 
 
+def test_classifies_expanded_workflow_categories():
+    cases = {
+        "timing_violation_01.txt": ("timing", "Timing/STA", True),
+        "synthesis_unmapped_01.txt": ("synthesis", "Synthesis", False),
+        "formal_property_01.txt": ("formal", "Formal Verification", True),
+        "dft_scan_01.txt": ("dft", "DFT", False),
+    }
+    for log_name, (category, owner, human_review) in cases.items():
+        result = triage(_read_log(log_name))
+        assert result.issue_category == category
+        assert result.suggested_owner_team == owner
+        assert result.human_review_required is human_review
+
+
 def test_empty_input_routes_to_human_review():
     result = triage("")
     assert result.issue_category == "unknown"

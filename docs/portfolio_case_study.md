@@ -22,8 +22,8 @@ The application has four main surfaces:
 
 - **Ask Copilot:** RAG Q&A with source+section citations, confidence, and human-review flags.
 - **Retrieval Inspector:** top-k retrieved chunks with scores, sources, sections, and relevance indicators.
-- **Workflow Triage Agent:** deterministic six-step triage for build, verification, lint, CDC/reset, and unknown issues.
-- **Evaluation Dashboard:** QA and workflow metrics over held-out synthetic eval sets.
+- **Workflow Triage Agent:** deterministic six-step triage for build, verification, lint, CDC/reset, timing, synthesis, formal, DFT, and unknown issues.
+- **Evaluation Dashboard:** QA and workflow metrics over held-out synthetic eval sets, including dense vs hybrid retrieval comparison and workflow confusion-matrix/error analysis.
 
 The same core modules are also exposed through a FastAPI service layer, making the project feel like an internal tool that could be integrated into CI, ticketing, or engineering support workflows.
 
@@ -34,7 +34,7 @@ The system is intentionally lightweight:
 - `app.py` provides the Streamlit interface.
 - `api.py` exposes `/health`, `/retrieve`, `/ask`, `/triage`, and `/evaluate`.
 - `src/ingestion.py` chunks the markdown knowledge base and builds the FAISS index.
-- `src/retrieval.py` performs top-k retrieval with optional source filters.
+- `src/retrieval.py` performs top-k dense retrieval, lightweight lexical scoring, hybrid dense+lexical retrieval, and optional source filtering.
 - `src/rag_pipeline.py` builds prompts, calls the live or mock LLM path, attaches citations, and computes confidence.
 - `src/agent_workflows.py` runs deterministic workflow triage.
 - `src/evaluation.py` computes QA and workflow evaluation metrics.
@@ -49,6 +49,7 @@ Key design choices:
 
 - Header-aware markdown chunking to keep sections coherent.
 - FAISS vector retrieval for fast local search.
+- Dependency-free lexical scoring blended with dense similarity for a lightweight hybrid retrieval baseline.
 - Sentence-transformer embeddings when available.
 - Deterministic hash-vector fallback when model download or external services are unavailable.
 - Confidence derived from retrieval strength and score separation.
@@ -72,11 +73,11 @@ This design is less flashy than a fully LLM-driven agent, but it is more suitabl
 The project includes two held-out synthetic evaluation sets:
 
 - **QA eval set:** 26 questions, including 20 in-scope questions and 6 out-of-scope or safety cases.
-- **Workflow eval set:** 8 triage cases covering build, verification, lint, CDC/reset, and unknown issues.
+- **Workflow eval set:** 12 triage cases covering build, verification, lint, CDC/reset, timing, synthesis, formal, DFT, and unknown issues.
 
-QA metrics include retrieval hit rate, MRR, citation coverage, average similarity, missing-context rate, Grounded Answer Rate / Citation Faithfulness, high-risk routing accuracy, and out-of-scope handling accuracy.
+QA metrics include retrieval hit rate, MRR, citation coverage, average similarity, missing-context rate, Grounded Answer Rate / Citation Faithfulness, high-risk routing accuracy, out-of-scope handling accuracy, and dense vs hybrid retrieval comparison.
 
-Workflow metrics include issue-category accuracy, owner-team accuracy, escalation accuracy, human-review rate, and confidence calibration.
+Workflow metrics include issue-category accuracy, owner-team accuracy, escalation accuracy, human-review rate, confidence calibration, and a category confusion matrix.
 
 ## Key results
 
@@ -86,6 +87,7 @@ The README reports the current deterministic mock-LLM baseline:
 - Mean reciprocal rank: **0.875** on in-scope questions.
 - Citation coverage: **95%** on in-scope questions.
 - Grounded Answer Rate / Citation Faithfulness: **90%** on in-scope questions.
+- Dense vs hybrid retrieval comparison: dense hit rate **95%** / MRR **0.875**; hybrid hit rate **95%** / MRR **0.950** on the synthetic in-scope QA set.
 - Out-of-scope handling accuracy: **100%** on safety/refusal cases.
 - Workflow issue-category accuracy: **100%**.
 - Workflow owner-team accuracy: **100%**.
@@ -96,27 +98,27 @@ These results are from the included synthetic eval sets and should be interprete
 ## Limitations
 
 - The knowledge base is synthetic, intentionally small, and much simpler than a real internal documentation corpus.
-- The retrieval stack does not include a reranker or hybrid lexical+dense search.
-- The workflow categories are intentionally narrow.
+- The retrieval stack includes a lightweight hybrid baseline but no cross-encoder reranker.
+- The workflow categories are still synthetic and intentionally scoped, even after adding timing, synthesis, formal, and DFT examples.
 - The app does not include authentication, access control, audit logging, or document permissions.
 - The mock LLM is deterministic and useful for reproducibility, but it is not a substitute for evaluating a production LLM endpoint.
 
 ## Future improvements
 
-- Add a cross-encoder reranker and compare against the FAISS-only baseline.
-- Add hybrid BM25+dense retrieval for exact-match engineering terms.
+- Add a cross-encoder reranker and compare against dense and hybrid baselines.
+- Add a stronger BM25 implementation for exact-match engineering terms.
 - Add latency, retrieval drift, and per-step observability metrics.
 - Add a connector pattern for private documentation systems.
 - Add auth, permissions, and source-level access filtering.
-- Extend triage categories and evaluate on a larger failure-log set.
+- Evaluate expanded triage categories on a larger failure-log set.
 
 ## What this project demonstrates for AI engineering roles
 
 This project demonstrates practical AI engineering beyond a basic chatbot:
 
-- RAG architecture with citations, retrieval inspection, and groundedness metrics.
+- RAG architecture with citations, retrieval inspection, dense/hybrid retrieval comparison, and groundedness metrics.
 - Agent workflow design where deterministic routing is used for reliability.
 - API design that exposes the AI workflow as a service.
-- Evaluation discipline with held-out test sets and reproducible mock-mode behavior.
+- Evaluation discipline with held-out test sets, error analysis, confusion matrix, and reproducible mock-mode behavior.
 - Product judgment around trust, high-risk domains, human review, and public-safe demo data.
 - Recruiter-facing communication through screenshots, demo script, case study, and deployment docs.

@@ -10,6 +10,8 @@ Metrics implemented:
 - Out-of-scope handling accuracy (safety / refusal cases)
 - Workflow classification accuracy / owner accuracy / escalation accuracy
 - Calibration: avg confidence on correct vs incorrect
+- Dense vs hybrid retrieval comparison over the QA set
+- Workflow confusion matrix for issue category prediction
 """
 from __future__ import annotations
 
@@ -20,7 +22,7 @@ from pathlib import Path
 from . import config
 from .agent_workflows import triage
 from .rag_pipeline import answer
-from .retrieval import retrieve
+from .retrieval import retrieve, retrieve_hybrid
 from .utils import keyword_match_count, read_json, write_json
 
 
@@ -69,6 +71,7 @@ class QAReport:
     grounded_answer_rate: float
     high_risk_routing_accuracy: float
     out_of_scope_handling_accuracy: float
+    retrieval_comparison: list[dict] = field(default_factory=list)
     items: list[dict] = field(default_factory=list)
     timestamp: float = 0.0
     mode: str = ""
@@ -102,6 +105,44 @@ def _out_of_scope_handled(item_result: dict, actual_hr: bool) -> bool:
     if not item_result.get("is_out_of_scope"):
         return False
     return actual_hr and item_result["keyword_hits"] >= 1
+
+
+def _retrieval_method_metrics(items: list[dict], top_k: int) -> list[dict]:
+    """Compare dense and hybrid retrieval on regular in-scope QA items."""
+    methods = {
+        "dense": retrieve,
+        "hybrid": retrieve_hybrid,
+    }
+    regular = [it for it in items if not bool(it.get("is_out_of_scope", False))]
+    denom = len(regular) or 1
+    rows: list[dict] = []
+    for name, fn in methods.items():
+        hits = 0
+        reciprocal_ranks = 0.0
+        citation_hits = 0
+        for it in regular:
+            expected = it.get("expected_sources", [])
+            retrieved = fn(it["question"], top_k=top_k)
+            retrieved_sources = [r.chunk.source for r in retrieved]
+            hit = any(s in retrieved_sources for s in expected) if expected else False
+            if hit:
+                hits += 1
+                citation_hits += 1
+            for rank, r in enumerate(retrieved, start=1):
+                if r.chunk.source in expected:
+                    reciprocal_ranks += 1.0 / rank
+                    break
+        rows.append(
+            {
+                "method": name,
+                "hit_rate": round(hits / denom, 4),
+                "mrr": round(reciprocal_ranks / denom, 4),
+                "citation_coverage": round(citation_hits / denom, 4),
+                "n_regular": len(regular),
+                "top_k": top_k,
+            }
+        )
+    return rows
 
 
 def evaluate_qa(top_k: int | None = None) -> QAReport:
@@ -203,6 +244,7 @@ def evaluate_qa(top_k: int | None = None) -> QAReport:
         grounded_answer_rate=round(grounded, 4),
         high_risk_routing_accuracy=round(high_risk_acc, 4),
         out_of_scope_handling_accuracy=round(oos_acc, 4),
+        retrieval_comparison=_retrieval_method_metrics(items, k),
         items=[r.to_dict() for r in results],
         timestamp=time.time(),
         mode=config.llm_mode_label(),
@@ -241,6 +283,7 @@ class WorkflowReport:
     avg_confidence_correct: float
     avg_confidence_incorrect: float
     human_review_rate: float
+    confusion_matrix: list[dict] = field(default_factory=list)
     items: list[dict] = field(default_factory=list)
     timestamp: float = 0.0
 
@@ -281,6 +324,15 @@ def evaluate_workflows() -> WorkflowReport:
     avg_correct = sum(correct) / len(correct) if correct else 0.0
     avg_incorrect = sum(incorrect) / len(incorrect) if incorrect else 0.0
     hr_rate = sum(1 for r in results if r.actual_human_review) / n
+    labels = sorted({r.expected_category for r in results} | {r.predicted_category for r in results})
+    confusion = []
+    for expected in labels:
+        row = {"expected": expected}
+        for predicted in labels:
+            row[predicted] = sum(
+                1 for r in results if r.expected_category == expected and r.predicted_category == predicted
+            )
+        confusion.append(row)
 
     return WorkflowReport(
         n=n,
@@ -290,6 +342,7 @@ def evaluate_workflows() -> WorkflowReport:
         avg_confidence_correct=round(avg_correct, 4),
         avg_confidence_incorrect=round(avg_incorrect, 4),
         human_review_rate=round(hr_rate, 4),
+        confusion_matrix=confusion,
         items=[r.to_dict() for r in results],
         timestamp=time.time(),
     )
