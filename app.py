@@ -183,7 +183,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**LLM mode**")
     st.caption(config.llm_mode_label())
-    if st.button("Rebuild index", use_container_width=True):
+    if st.button("Rebuild index", width="stretch"):
         with st.spinner("Re-embedding knowledge base..."):
             rebuild_index()
         st.success("Index rebuilt.")
@@ -242,7 +242,7 @@ with tab_ask:
     st.markdown("**Example questions**")
     cols = st.columns(len(EXAMPLES))
     for i, ex in enumerate(EXAMPLES):
-        if cols[i].button(ex, key=f"ex_{i}", use_container_width=True):
+        if cols[i].button(ex, key=f"ex_{i}", width="stretch"):
             st.session_state.ask_query = ex
 
     query = st.text_area(
@@ -279,7 +279,7 @@ with tab_ask:
                 st.markdown(
                     f'<div class="review-callout"><strong>Human review required</strong> — {reason}. '
                     "Treat this answer as general guidance and confirm with the relevant hardware, "
-                    "design, integration, or verification owner before making decisions.</div>",
+                    "design, integration, or verification owner before making implementation or sign-off decisions.</div>",
                     unsafe_allow_html=True,
                 )
             st.caption(
@@ -332,7 +332,8 @@ with tab_retr:
                     for r in rows
                 ]
             )
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width="stretch", hide_index=True)
+            st.caption("Scores are relative retrieval similarity signals, not calibrated probabilities.")
             with st.expander("Full retrieved chunk text", expanded=False):
                 for r in rows:
                     st.markdown(f"##### Rank {r['rank']}")
@@ -389,7 +390,8 @@ with tab_triage:
             st.markdown(
                 '<div class="review-callout"><strong>Human review required.</strong> '
                 "This category is high-risk or the agent is not confident enough to auto-route. "
-                "Confirm with the relevant hardware, design, integration, or verification owner.</div>",
+                "Confirm with the relevant hardware, design, integration, or verification owner "
+                "before making implementation or sign-off decisions.</div>",
                 unsafe_allow_html=True,
             )
 
@@ -423,7 +425,7 @@ with tab_triage:
             )
             st.caption(
                 "Edit this draft before copying it into a ticketing system. "
-                "No external ticket is submitted from this demo."
+                "This demo does not submit tickets externally."
             )
             st.markdown("#### Structured output (JSON)")
             structured = {
@@ -452,9 +454,9 @@ with tab_eval:
         "measures whether the system correctly refuses sign-off and proprietary-data requests."
     )
     st.info(
-        "These metrics are computed on small synthetic held-out evaluation sets. "
-        "They are useful for portfolio validation and regression testing, but should not be "
-        "interpreted as production performance."
+        "Evaluation uses small synthetic held-out datasets. Near-perfect scores are expected "
+        "in this controlled portfolio demo and should be interpreted as regression-test / "
+        "portfolio-validation signals, not production performance."
     )
 
     run_eval = st.button("Run evaluation", type="primary")
@@ -485,7 +487,7 @@ with tab_eval:
             "out_of_scope_handled", "reciprocal_rank", "top_score",
             "keyword_hits", "expect_human_review", "actual_human_review", "high_risk_correct",
         ]
-        st.dataframe(qa_df[display_cols], use_container_width=True, hide_index=True)
+        st.dataframe(qa_df[display_cols], width="stretch", hide_index=True)
 
         st.markdown("**Topic distribution**")
         topic_counts = qa_df.groupby("topic").size().reset_index(name="count")
@@ -496,7 +498,7 @@ with tab_eval:
             st.markdown("**Retrieval misses**")
             st.dataframe(
                 failures[["id", "question", "expected_sources", "retrieved_sources"]],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
@@ -514,12 +516,12 @@ with tab_eval:
 
         wf_df = pd.DataFrame(wf.items)
         st.markdown("**Per-case results**")
-        st.dataframe(wf_df, use_container_width=True, hide_index=True)
+        st.dataframe(wf_df, width="stretch", hide_index=True)
 
         wf_fail = wf_df[~wf_df["category_correct"]]
         if not wf_fail.empty:
             st.markdown("**Classification misses**")
-            st.dataframe(wf_fail, use_container_width=True, hide_index=True)
+            st.dataframe(wf_fail, width="stretch", hide_index=True)
     else:
         st.info("Click **Run evaluation** to compute retrieval and triage metrics over the held-out eval sets.")
 

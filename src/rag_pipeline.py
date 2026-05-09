@@ -123,7 +123,8 @@ def answer(query: str, top_k: Optional[int] = None) -> RAGResponse:
         text = (text or "").rstrip() + (
             "\n\n**Human review required.** This topic is high-risk; treat the "
             "above as general guidance and confirm with the relevant hardware, "
-            "design, integration, or verification owner before making decisions."
+            "design, integration, or verification owner before making implementation "
+            "or sign-off decisions."
         )
 
     embedder = ""

@@ -217,6 +217,8 @@ QA and workflow metric cards including retrieval hit rate, MRR, Grounded Answer 
 - Plug in an internal documentation source via a connector pattern.
 - Track per-tool latency and per-step token usage in the dashboard.
 
+See the practical roadmap in [docs/future_improvements.md](docs/future_improvements.md).
+
 ## Repository layout
 
 ```

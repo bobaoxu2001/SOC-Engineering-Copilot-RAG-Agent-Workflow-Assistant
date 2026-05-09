@@ -1,11 +1,43 @@
 # Future Improvements
 
-Practical next steps to move this portfolio demo closer to production-grade internal AI tooling:
+This roadmap keeps the project honest as a portfolio demo while outlining practical steps toward production-grade internal AI tooling.
 
-- Expand the synthetic knowledge base with richer engineering docs, more edge cases, and deeper playbooks.
-- Add hybrid retrieval and reranking to compare dense-only retrieval against BM25+dense plus cross-encoder reranking.
-- Add confidence calibration using a larger validation set and track calibration drift over time.
-- Add a confusion matrix and deeper error analysis for both QA retrieval and workflow triage outcomes.
-- Add an editable ticket workflow integration that keeps the human in control before any external submission.
-- Add source-level permissions, audit logs, and monitoring for access-controlled internal documentation.
-- Add larger historical log evaluation to test routing quality across more realistic build, lint, verification, CDC, and integration failures.
+## Expand Knowledge Base And Dynamic Indexing
+
+- Expand the synthetic knowledge base with richer engineering docs, deeper playbooks, and more edge cases.
+- Add dynamic indexing for new or updated documents, with clear index rebuild status and validation checks.
+
+## Add Hybrid Retrieval And Reranking
+
+- Compare dense FAISS retrieval against BM25+dense hybrid retrieval.
+- Add a cross-encoder reranker and measure whether it improves hit rate, MRR, and grounded-answer rate.
+
+## Add Confidence Calibration
+
+- Calibrate answer and routing confidence against a larger validation set.
+- Track calibration drift when the knowledge base, eval set, or embedding model changes.
+
+## Expand Triage Categories
+
+- Add timing, synthesis, formal verification, and DFT triage categories.
+- Extend workflow eval coverage for each new category before surfacing it in the app.
+
+## Add Deeper Error Analysis
+
+- Add a confusion matrix for workflow classification and owner routing.
+- Add richer per-question failure analysis for retrieval misses, citation misses, and safety-routing errors.
+
+## Add Governance And Observability
+
+- Add source-level permissions so users only retrieve documents they are allowed to access.
+- Add audit logs and monitoring for usage, latency, low-confidence answers, and high-risk review events.
+
+## Add Editable Ticketing Workflow Integration
+
+- Keep the editable ticket draft pattern, but add an approval step before any ticketing-system integration.
+- Preserve a human-in-the-loop workflow so the demo never auto-submits external tickets.
+
+## Evaluate On Larger Historical Logs
+
+- Evaluate routing and escalation quality on larger historical build, lint, verification, CDC, integration, and methodology logs.
+- Compare controlled synthetic results against realistic historical failure distributions.
