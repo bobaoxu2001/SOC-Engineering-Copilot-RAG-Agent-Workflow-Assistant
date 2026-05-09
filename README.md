@@ -233,6 +233,7 @@ SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/
   app.py                         # Streamlit four-tab UI
   api.py                         # FastAPI service layer (5 endpoints)
   requirements.txt
+  runtime.txt                    # Streamlit Cloud Python runtime pin
   .env.example
   .github/
     workflows/
@@ -248,8 +249,8 @@ SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/
     utils.py
   data/
     knowledge_base/              # 6 synthetic engineering markdown docs
-    eval/                        # QA (26) + workflow (8) eval sets
-    sample_logs/                 # 4 synthetic build/verify/lint logs
+    eval/                        # QA + workflow eval sets
+    sample_logs/                 # synthetic workflow logs
     index/                       # FAISS index cache (gitignored except .gitkeep)
   tests/
     test_retrieval.py
@@ -261,6 +262,7 @@ SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/
     portfolio_case_study.md
     interview_talking_points.md
     website_copy.md
+    future_improvements.md
     architecture.md
     architecture_overview.mmd
     triage_workflow.mmd

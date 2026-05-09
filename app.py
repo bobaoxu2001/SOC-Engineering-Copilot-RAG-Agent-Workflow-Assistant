@@ -20,7 +20,7 @@ from src import config
 from src.agent_workflows import triage
 from src.evaluation import evaluate_qa, evaluate_workflows, save_eval_results
 from src.rag_pipeline import answer
-from src.retrieval import index_status, rebuild_index, retrieve, retrieved_summary
+from src.retrieval import index_status, rebuild_index, retrieve, retrieve_hybrid, retrieved_summary
 
 st.set_page_config(
     page_title="SOC Engineering Copilot",
@@ -307,30 +307,41 @@ with tab_retr:
         "top-k results — the raw substrate that the RAG layer builds on."
     )
 
-    c1, c2 = st.columns([3, 1])
+    c1, c2, c3 = st.columns([3, 1, 1.4])
     with c1:
         ri_query = st.text_input("Query", value="What is a two-flop synchronizer used for?")
     with c2:
         top_k = st.slider("top-k", 1, 10, 5)
+    with c3:
+        retrieval_method = st.selectbox(
+            "Retrieval method",
+            options=["Dense FAISS", "Hybrid dense + lexical"],
+        )
     if st.button("Search index", type="primary"):
-        with st.spinner("Searching FAISS index..."):
-            items = retrieve(ri_query, top_k=top_k)
+        retriever = retrieve_hybrid if retrieval_method == "Hybrid dense + lexical" else retrieve
+        with st.spinner("Searching index..."):
+            items = retriever(ri_query, top_k=top_k)
             rows = retrieved_summary(items)
         if not rows:
             st.warning("No results.")
         else:
+            table_rows = []
+            for r in rows:
+                row = {
+                    "rank": r["rank"],
+                    "score": round(r["score"], 4),
+                    "source": r["source"],
+                    "section": r["section"],
+                    "likely_relevant": r["likely_relevant"],
+                    "snippet": r["snippet"],
+                }
+                if "dense_score" in r:
+                    row["dense_score"] = round(r["dense_score"], 4)
+                if "lexical_score" in r:
+                    row["lexical_score"] = round(r["lexical_score"], 4)
+                table_rows.append(row)
             df = pd.DataFrame(
-                [
-                    {
-                        "rank": r["rank"],
-                        "score": round(r["score"], 4),
-                        "source": r["source"],
-                        "section": r["section"],
-                        "likely_relevant": r["likely_relevant"],
-                        "snippet": r["snippet"],
-                    }
-                    for r in rows
-                ]
+                table_rows
             )
             st.dataframe(df, width="stretch", hide_index=True)
             st.caption("Scores are relative retrieval similarity signals, not calibrated probabilities.")
