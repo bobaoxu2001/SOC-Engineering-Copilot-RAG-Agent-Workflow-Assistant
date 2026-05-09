@@ -1,0 +1,14 @@
+flowchart LR
+    INPUT["Build / verification / lint log"]
+    CLASSIFY["1. Classify issue<br/>build · verification · lint · CDC/reset · unknown"]
+    RETRIEVE["2. Retrieve playbook context<br/>category-specific source filter"]
+    HYPOTHESIS["3. Hypothesize root cause<br/>pattern-driven explanation"]
+    STEPS["4. Recommend next steps<br/>defaults + retrieved checklist lines"]
+    ESCALATE["5. Decide escalation<br/>owner team · confidence · human review"]
+    TICKET["6. Generate ticket summary<br/>compact handoff"]
+    OUTPUT["Structured triage result"]
+
+    INPUT --> CLASSIFY --> RETRIEVE --> HYPOTHESIS --> STEPS --> ESCALATE --> TICKET --> OUTPUT
+    ESCALATE --> REVIEW{"High risk or uncertain?"}
+    REVIEW -->|"yes"| HUMAN["Human review required"]
+    REVIEW -->|"no"| AUTO["Routine first-pass triage"]

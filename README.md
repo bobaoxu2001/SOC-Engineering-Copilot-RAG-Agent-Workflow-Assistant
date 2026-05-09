@@ -1,4 +1,4 @@
-# SOC Engineering Copilot: RAG + Agent Workflow Assistant
+# Engineering Knowledge Copilot: RAG + Agent Workflow Assistant
 
 [![CI](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant/actions/workflows/ci.yml)
 [![Live Demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://soc-ai-copilot.streamlit.app/)
@@ -6,7 +6,7 @@
 **Live Demo:** https://soc-ai-copilot.streamlit.app/
 **GitHub:** https://github.com/bobaoxu2001/SOC-Engineering-Copilot-RAG-Agent-Workflow-Assistant
 
-> Portfolio project targeting **NVIDIA JR2017063 — SOC AI Application Engineer (AI Services, Agents and Knowledge Systems), Shanghai**. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
+> Portfolio-grade internal AI tooling project for engineering knowledge retrieval, cited RAG answers, and deterministic workflow triage. The knowledge base is synthetic and public-safe; this prototype is not a sign-off authority and does not use proprietary data.
 
 **Quick demo:** open the [live Streamlit app](https://soc-ai-copilot.streamlit.app/), run `streamlit run app.py` locally, or review the screenshots below.
 
@@ -15,7 +15,7 @@
 | | |
 |---|---|
 | **What it does** | Cited Q&A over a synthetic engineering knowledge base, transparent vector retrieval, multi-step agentic triage of build/verification/lint logs, FastAPI service layer, and a quantitative evaluation dashboard |
-| **Why it matters** | Shows the full engineering pattern for a reliable internal LLM tool: RAG design, agent orchestration, evaluation rigor, safety guardrails — targeted at hardware/SOC engineering teams |
+| **Why it matters** | Shows the full engineering pattern for a reliable internal LLM tool: RAG design, agent orchestration, evaluation rigor, safety guardrails, API boundaries, and offline-safe demos |
 | **Key capabilities** | RAG · Retrieval Inspector · 6-step Triage Agent · FastAPI `/ask /retrieve /triage /evaluate` · CI pipeline |
 | **Evaluation results** | QA hit rate **95%**, grounded-answer rate **90%**, out-of-scope safety handling **100%**, high-risk routing **100%**, workflow classification **100%**, escalation **100%** |
 | **Tech stack** | Python · Streamlit · FastAPI · FAISS · sentence-transformers · OpenAI-compatible LLM · pytest · GitHub Actions |
@@ -33,19 +33,20 @@ A general-purpose chatbot is the wrong tool for a hardware engineering org: answ
 - **Mandatory human-review gating** on every high-risk hardware topic.
 - **Quantitative evaluation** including a custom Grounded Answer Rate / Citation Faithfulness metric.
 
-## NVIDIA JR2017063 alignment (short table)
+## Portfolio positioning
 
-| JD requirement | Where this project demonstrates it |
+This project is intentionally framed for multiple applied AI roles: AI Engineer, Applied AI Engineer, RAG Engineer, AI Agent Engineer, AI Deployment Analyst, and AI Product / Strategy roles. It uses a hardware/SOC engineering domain because that domain makes the reliability requirements concrete: answers need citations, routing needs to be auditable, and risky topics need a human reviewer.
+
+| Role signal | Where this project demonstrates it |
 |---|---|
-| LLM-backed services for engineering teams | RAG answer pipeline with cited responses (`src/rag_pipeline.py`) |
-| RAG / knowledge systems (chunking, embeddings, retrieval, citations) | Header-aware chunker + FAISS vector index with source+section citations (`src/ingestion.py`, `src/retrieval.py`) |
-| Agent orchestration / agentic workflows | 6-step deterministic triage agent (`src/agent_workflows.py`) |
-| Reusable skills / playbooks | Per-category triage playbooks and prompt templates |
-| Evaluation of retrieval and answer quality | QA + workflow evaluation runners with hit rate, MRR, grounded-answer rate, classification + escalation accuracy (`src/evaluation.py`) |
-| Reliability — confidence, fallback, human review | Confidence from retrieval signals, deterministic mock LLM fallback, mandatory human review on CDC / reset / integration / assertion topics |
-| Internal web tools for non-AI engineering users | Streamlit four-tab internal-tool UI (`app.py`) |
+| RAG / knowledge systems | Header-aware chunking, FAISS vector search, source+section citations, and retrieval inspection (`src/ingestion.py`, `src/retrieval.py`) |
+| AI agent workflows | 6-step deterministic triage pipeline with explicit classification, retrieval, hypothesis, next steps, escalation, and ticket summary (`src/agent_workflows.py`) |
+| AI service deployment | FastAPI layer over the same RAG and agent modules (`api.py`) |
+| Evaluation rigor | Held-out QA and workflow eval sets with hit rate, MRR, grounded-answer rate, safety handling, and routing accuracy (`src/evaluation.py`) |
+| Product judgment | Human-review gating, transparent retrieval, offline demo mode, and clear limits around sign-off authority |
+| Recruiter-facing communication | Case study, interview talking points, website copy, screenshots, and demo script in `docs/` |
 
-The full traceability table lives in [docs/nvidia_jd_alignment.md](docs/nvidia_jd_alignment.md).
+The NVIDIA-specific traceability table remains in [docs/nvidia_jd_alignment.md](docs/nvidia_jd_alignment.md), so the README can stay broadly useful while preserving targeted JD alignment.
 
 ## Features
 
@@ -83,7 +84,7 @@ flowchart TD
     ING --> INDEX
 ```
 
-Full diagram and component contracts: [docs/architecture.md](docs/architecture.md).
+Full diagram and component contracts: [docs/architecture.md](docs/architecture.md). Standalone Mermaid files are also available for reuse: [docs/architecture_overview.mmd](docs/architecture_overview.mmd) and [docs/triage_workflow.mmd](docs/triage_workflow.mmd).
 
 ## Tech stack
 
@@ -113,7 +114,7 @@ cp .env.example .env
 # edit .env to set OPENAI_API_KEY; otherwise the deterministic mock LLM is used automatically
 
 # 4. run tests
-pytest -q
+python -m pytest -q
 
 # 5. launch the Streamlit UI
 streamlit run app.py
@@ -246,7 +247,12 @@ soc-design-knowledge-copilot/
     test_api.py                  # FastAPI TestClient tests (9 tests)
   docs/
     project_brief.md
+    portfolio_case_study.md
+    interview_talking_points.md
+    website_copy.md
     architecture.md
+    architecture_overview.mmd
+    triage_workflow.mmd
     nvidia_jd_alignment.md
     demo_script.md               # 60-90 sec recruiter walkthrough
     resume_bullets.md            # Short/detailed/LinkedIn bullets targeting JR2017063
@@ -255,4 +261,4 @@ soc-design-knowledge-copilot/
 
 ## Disclaimer
 
-This project is a portfolio prototype targeting an NVIDIA AI tooling role. The knowledge base is synthetic and general; nothing in this repository represents proprietary NVIDIA content. The system is not a hardware sign-off authority and is not a substitute for review by a qualified hardware engineer. CDC, reset architecture, integration, and assertion-related topics always trigger human-review gating.
+This project is a portfolio prototype for internal AI tooling, RAG, agent workflows, and engineering productivity use cases. The knowledge base is synthetic and general; nothing in this repository represents proprietary NVIDIA content or proprietary hardware engineering data. The system is not a hardware sign-off authority and is not a substitute for review by a qualified hardware engineer. CDC, reset architecture, integration, and assertion-related topics always trigger human-review gating.

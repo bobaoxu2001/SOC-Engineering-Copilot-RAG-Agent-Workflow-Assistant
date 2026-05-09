@@ -6,13 +6,13 @@ even when the live LLM is in the loop.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass
 from typing import Optional
 
 from . import config
 from .mock_llm import compose_answer
 from .retrieval import Retrieved, retrieve
-from .utils import logger, truncate
+from .utils import logger
 
 
 SYSTEM_PROMPT = (

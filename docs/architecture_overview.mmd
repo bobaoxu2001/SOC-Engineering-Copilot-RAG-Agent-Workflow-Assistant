@@ -1,0 +1,30 @@
+flowchart TD
+    UI["Streamlit app<br/>Ask · Inspector · Triage · Eval"]
+    API["FastAPI service<br/>/health · /retrieve · /ask · /triage · /evaluate"]
+    RAG["RAG pipeline<br/>prompt · answer · citations · confidence"]
+    AGENT["Triage workflow<br/>classify · retrieve · route · ticket"]
+    EVAL["Evaluation runner<br/>QA metrics · workflow metrics"]
+    RET["Retrieval layer<br/>top-k search · source filters"]
+    ING["Ingestion<br/>markdown chunks · metadata"]
+    LLM["LLM path<br/>live API or deterministic mock"]
+    KB["Synthetic public-safe<br/>knowledge base"]
+    LOGS["Synthetic sample logs"]
+    INDEX[("FAISS index")]
+
+    UI --> RAG
+    UI --> RET
+    UI --> AGENT
+    UI --> EVAL
+    API --> RAG
+    API --> RET
+    API --> AGENT
+    API --> EVAL
+    RAG --> RET
+    RAG --> LLM
+    AGENT --> RET
+    AGENT --> LOGS
+    EVAL --> RAG
+    EVAL --> AGENT
+    RET --> INDEX
+    ING --> KB
+    ING --> INDEX

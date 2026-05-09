@@ -16,8 +16,6 @@ from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass, field
-from typing import Optional
-
 from . import config
 from .retrieval import retrieve
 from .utils import truncate

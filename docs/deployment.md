@@ -98,6 +98,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py           # mock LLM, no API key required
-pytest -q                      # 27 tests
+python -m pytest -q            # 27 tests
 uvicorn api:app --reload       # optional FastAPI layer on :8000
 ```
